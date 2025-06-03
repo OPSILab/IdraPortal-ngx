@@ -18,8 +18,8 @@ export class OidcUserInformationService {
     // this.idmUrl = configService.getSettings("idmBaseURL");
     this.authService.onTokenChange()
       .subscribe((token: OidcJWTToken) => {
-        if (token.isValid() && token.getPayload){
-          this.user=token.getPayload()
+        if (token.isValid()){
+          this.user=token.getAccessTokenPayload()
           this.publishUser(this.user)
         }
       });
