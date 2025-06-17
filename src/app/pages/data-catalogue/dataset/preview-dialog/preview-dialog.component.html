@@ -1,10 +1,16 @@
 <nb-card >
-    <nb-card-header>{{ title }}</nb-card-header>
+    <nb-card-header>
+      {{ title }}
+    </nb-card-header>
     <nb-card-body >
       <div class="card" [nbSpinner]="loading" nbSpinnerStatus="primary">
-        <div class="card-body" id="iframeBody">
+        <div class="card-body iframe"  id="iframeBody">
           </div>
       </div>
     </nb-card-body>
+  <nb-card-footer>
+    <div class="button-container">
+      <button nbButton status="primary" (click)="close()">{{ 'CLOSE' | translate }}</button>
+    </div>
+  </nb-card-footer>
   </nb-card>
-  
