@@ -29,7 +29,7 @@ export class PreviewDialogComponent {
     fetch(corsProxy + encodeURIComponent(this.url), { referrerPolicy: "unsafe-url" })
       .then(response => {
       const contentLength = response.headers.get('content-length');
-      if (contentLength && parseInt(contentLength, 10) > 20 * 1024 * 1024) {
+      if (contentLength && parseInt(contentLength, 10) > 15 * 1024 * 1024) {
         const container = document.getElementById('iframeBody');
         if (container) {
         container.innerHTML = '<div style="color: red; font-weight: bold; font-size: 1.2em;">{{ "PREVIEW_SIZE_TOO_LARGE" | translate }}</div>';
@@ -95,7 +95,7 @@ export class PreviewDialogComponent {
   //   this.loading = false;
   // }
   } else {
-    if (this.text && this.text.length > 20 * 1024 * 1024) {
+    if (this.text && this.text.length > 15 * 1024 * 1024) {
       const container = document.getElementById('iframeBody');
       if (container) {
       container.innerHTML = '<div style="color: red; font-weight: bold; font-size: 1.2em;">{{ "PREVIEW_SIZE_TOO_LARGE" | translate }}</div>';
