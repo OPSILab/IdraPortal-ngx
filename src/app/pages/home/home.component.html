@@ -70,7 +70,7 @@
               </nb-select>
             </div>
             <div class="col-8 d-flex align-items-center" *ngIf="multiLanguageChecked">
-              <nb-select multiple [(selected)]="targetsLanguage" placeholder="{{ 'HOME_TARGETS' | translate }}" class="max-width-webkitfill">
+              <nb-select multiple [(selected)]="targetsLanguage" placeholder="{{ 'HOME_TARGETS' | translate }}" class="width-auto">
                 <nb-option *ngFor="let lang of languages" [value]="lang.value">{{ lang.text }}</nb-option>
               </nb-select>
             </div>
@@ -102,14 +102,17 @@
                 <nb-option [value]="50">50</nb-option>
               </nb-select>
             </div>
-            <div class="col-md-2 col-12 d-flex align-items-center offset-md-1">
+            <div class="col-md-2 col-12 d-flex align-items-center">
+              <nb-checkbox (checkedChange)="toggleHasHVDCategory($event)">{{ 'HOME_IS_HVD' | translate }}</nb-checkbox>
+            </div>
+            <div class="col-md-1 col-12 d-flex align-items-center">
               <button 
                 nbButton
                 fullWidth
                 status="primary"
                 size="small"
                 [class.btn-pulse]="submitted"
-                (click)="toggleAdvancedSearch()">
+                (click)="advancedSearchReq()">
                 {{ 'SEARCH' | translate }}
             </button>
             </div>

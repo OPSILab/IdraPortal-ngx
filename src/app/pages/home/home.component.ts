@@ -3,7 +3,6 @@ import { DataCataglogueAPIService } from '../data-catalogue/services/data-catagl
 import { ODMSCatalogueInfo } from '../data-catalogue/model/odmscatalogue-info';
 import { SearchRequest } from '../data-catalogue/model/search-request';
 import { SearchResult } from '../data-catalogue/model/search-result';
-import { randomInt } from 'crypto';
 import { Router } from '@angular/router';
 import { NbTagComponent, NbTagInputAddEvent } from '@nebular/theme';
 import { TranslateService } from '@ngx-translate/core';
@@ -34,8 +33,8 @@ export class HomeComponent implements OnInit {
   selectableOptions: Array<string> = [];
   options: Array<any> = ['description', 'tags', 'title'];
 
-  releasedDate: Array<Date> = [];
-  updatedDate: Array<Date> = [];
+  releasedDate: Array<String> = [];
+  updatedDate: Array<String> = [];
   
   catalogueList: Array<any> = [];
   selectedCatalogues: Array<number> = [0];
@@ -58,9 +57,19 @@ export class HomeComponent implements OnInit {
   sortyBy: number = 4;
   order: number = 0;
   multiLanguageChecked = false;
+  isHVD_Dataset = false;
 
   toggleMultiLanguage(checked: boolean) {
     this.multiLanguageChecked = checked;
+  }
+
+  toggleHasHVDCategory(checked: boolean) {
+    if (checked) {
+      this.isHVD_Dataset = true;
+    }
+    else {
+      this.isHVD_Dataset = false;
+    }
   }
 
   toggleAdvancedSearch(){
@@ -116,6 +125,9 @@ export class HomeComponent implements OnInit {
           filters.push({field: filter.type, value: filter.tags.join(',')});
         }
       });
+      if(this.Filters.length == 1 && this.Filters[0].type == 'ALL' && this.Filters[0].tags.length == 0){
+        filters.push({field: 'ALL', value: ''});
+      }
       let selectedCatalogues
       if(this.selectedCatalogues.includes(0)){
         selectedCatalogues = this.selectedCatalogues.filter(x=>x!=0);
@@ -158,22 +170,27 @@ export class HomeComponent implements OnInit {
           targetLanguages: []
         }
       }
+      if(this.isHVD_Dataset){
+        params['hasHvdCategory'] = true;
+      }
       if(this.multiLanguageChecked){
         params.euroVocFilter.sourceLanguage = this.sourceLanguage;
         params.euroVocFilter.targetLanguages = this.targetsLanguage;
       }
+      console.log("dates: ",this.releasedDate, this.updatedDate)
       if(this.releasedDate.length > 0){
-        params['releasedDate'] = {
+        params['releaseDate'] = {
           start: this.releasedDate[0],
           end: this.releasedDate[1]
         }
       }
       if(this.updatedDate.length > 0){
-        params['updatedDate'] = {
+        params['updateDate'] = {
           start: this.updatedDate[0],
           end: this.updatedDate[1]
         }
       }
+      console.log("params: ", params)
       this.router.navigate(['/pages/datasets'], {
         queryParams: { params: JSON.stringify(params), advancedSearch: true }
       })
@@ -182,10 +199,14 @@ export class HomeComponent implements OnInit {
   }
 
   updateDate(event:any, type:number){
+    let start = new Date(event.start);
+    let end = new Date(event.end);
+    let start_string = new Date(Date.UTC(start.getFullYear(), start.getMonth(), start.getDate(), 0, 0, 0)).toISOString();
+    let end_string = new Date(Date.UTC(end.getFullYear(), end.getMonth(), end.getDate(), 0, 0, 0)).toISOString();
     if(type == 0){
-      this.releasedDate = event;
+      this.releasedDate = [start_string, end_string];
     } else {
-      this.updatedDate = event;
+      this.updatedDate = [start_string, end_string];
     }
   }
 
@@ -217,19 +238,19 @@ export class HomeComponent implements OnInit {
 	// 	{value:"TECH",icon:"tech",text:"Technology"},
 	// 	{value:"TRAN",icon:"tran",text:"Transport"}];
 
-	dcatThemes=[{value:"Agriculture, fisheries, forestry and food",icon:"agri",text:"Agriculture"},
-		{value:"Economy and finance",icon:"econ",text:"Economy"},
-		{value:"Education, culture and sport",icon:"educ",text:"Education"},
-		{value:"Energy",icon:"ener",text:"Energy"},
-		{value:"Environment",icon:"envi",text:"Environment"},
-		{value:"Government and public sector",icon:"gove",text:"Government"},
-		{value:"Health",icon:"heal",text:"Health"},
-		{value:"International issues",icon:"intr",text:"International"},
-		{value:"Justice, legal system and public safety",icon:"just",text:"Justice"},
-		{value:"Regions and cities",icon:"regi",text:"Regions"},
-		{value:"Population and society",icon:"soci",text:"Population"},
-		{value:"Science and technology",icon:"tech",text:"Technology"},
-		{value:"Transport",icon:"tran",text:"Transport"}];
+	dcatThemes=[{value:"Agriculture, fisheries, forestry and food",icon:"agri",text:"Agriculture"}, //maybe
+		{value:"Economy and finance",icon:"econ",text:"Economy"}, //ok
+		{value:"Education, culture and sport",icon:"educ",text:"Education"}, //not ok
+		{value:"Energy",icon:"ener",text:"Energy"}, //ok
+		{value:"Environment",icon:"envi",text:"Environment"}, //ok
+		{value:"Government and public sector",icon:"gove",text:"Government"}, //ok 
+		{value:"Health",icon:"heal",text:"Health"}, //maybe
+		{value:"International issues",icon:"intr",text:"International"}, //maybe
+		{value:"Justice, legal system and public safety",icon:"just",text:"Justice"}, //not ok
+		{value:"Regions and cities",icon:"regi",text:"Regions"}, //ok
+		{value:"Population and society",icon:"soci",text:"Population"}, //ok
+		{value:"Science and technology",icon:"tech",text:"Technology"}, //ok
+		{value:"Transport",icon:"tran",text:"Transport"}]; //ok
 
     
   ngOnInit(): void {
@@ -312,6 +333,6 @@ export class HomeComponent implements OnInit {
 
   searchCategory(category:any){
     console.log(category)
-    this.router.navigate(['/pages/datasets'], {queryParams:{search_value: category.text, text: category.value}})
+    this.router.navigate(['/pages/datasets'], {queryParams:{search_value: category.value, text: category.text}})
   }
 }
