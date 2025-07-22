@@ -6,7 +6,7 @@ import { DataCatalogueRoutingModule } from './data-catalogue-routing.module';
 import { SearchComponent } from './search/search.component';
 import { DatasetComponent } from './dataset/dataset.component';
 import { DataCatalogueComponent } from './data-catalogue.component';
-import { NbAccordionModule, NbActionsModule, NbButton, NbButtonModule, NbCardModule, NbDialogModule, NbFormFieldModule, NbIconModule, NbInputModule, NbListModule, NbSelectModule, NbSpinnerModule, NbTagModule, NbToastrModule, NbTooltipModule } from '@nebular/theme';
+import { NbAccordionModule, NbActionsModule, NbButton, NbButtonModule, NbCardModule, NbCheckboxModule, NbDialogModule, NbFormFieldModule, NbIconModule, NbInputModule, NbListModule, NbSelectModule, NbSpinnerModule, NbTagModule, NbToastrModule, NbTooltipModule } from '@nebular/theme';
 import { DistributionComponent } from './distribution/distribution.component';
 import { MarkdownModule } from 'ngx-markdown';
 import { DataletIframeComponent } from './datalet-iframe/datalet-iframe.component';
@@ -37,6 +37,7 @@ import { TranslateModule } from '@ngx-translate/core';
     NbActionsModule,
     NbSelectModule,
     NbButtonModule,
+    NbCheckboxModule,
   ]
 })
 export class DataCatalogueModule { }

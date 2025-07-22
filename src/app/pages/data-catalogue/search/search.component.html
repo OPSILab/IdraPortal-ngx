@@ -17,6 +17,19 @@
   </div>
   <div class="row" *ngIf="searchResponse.count>0">
     <div class="col-md-3 col-12">
+
+      <nb-card status="primary">
+        <nb-card-header class="d-flex justify-content-between">
+          {{ 'HOME_IS_HVD' | translate }}
+        </nb-card-header>
+        <nb-card-body>
+          <div class="d-flex align-items-center mt-2 gap-3">
+            <nb-checkbox [checked]="isHVD_Dataset === true" (checkedChange)="toggleHasHVDCategory(true)">Yes</nb-checkbox>
+            <nb-checkbox [checked]="isHVD_Dataset === false" (checkedChange)="toggleHasHVDCategory(false)">No</nb-checkbox>
+          </div>
+        </nb-card-body>
+      </nb-card>
+
       <nb-card *ngFor="let facet of searchResponse.facets" status="primary">
         <nb-card-header class="d-flex justify-content-between">
           {{facet.displayName}}

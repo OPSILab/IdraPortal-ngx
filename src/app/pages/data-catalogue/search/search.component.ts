@@ -39,6 +39,7 @@ export class SearchComponent implements OnInit {
 
   filters: Array<string> = [];
   filtersTags: Array<string>= [];
+  isHVD_Dataset = false;
 
   ngOnInit(): void { 
     this.searchResponse.facets = [];
@@ -53,6 +54,10 @@ export class SearchComponent implements OnInit {
       console.log(searchParam)
       if(searchParam['advancedSearch'] == 'true'){
         this.searchRequest = JSON.parse(searchParam['params']);
+        // Update the local HVD state from the search request
+        if(this.searchRequest.hasHvdCategory) {
+          this.isHVD_Dataset = true;
+        }
         // this.filtersTags = searchParam['params'].filters.map(x=>x.value);
         this.searchDataset(true)
       } else{
@@ -91,6 +96,17 @@ export class SearchComponent implements OnInit {
   updateFilters(tags){
       this.filters= tags;
       this.searchDataset()
+  }
+
+  toggleHasHVDCategory(checked: boolean) {
+    if (checked) {
+      this.isHVD_Dataset = true;
+      this.searchRequest.hasHvdCategory = true;
+    } else {
+      this.isHVD_Dataset = false;
+      this.searchRequest.hasHvdCategory = undefined;
+    }
+    this.searchDataset();
   }
 
   pageChanged($event:number){
