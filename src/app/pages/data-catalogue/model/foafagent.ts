@@ -1,6 +1,6 @@
 export class FOAFAgent {
   id?: string;
-  name: string;
+  name?: string[];
   resourceUri?: string;
   propertyUri?: string;
   mbox?: string;

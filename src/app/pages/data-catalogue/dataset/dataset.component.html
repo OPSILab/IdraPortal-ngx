@@ -59,9 +59,11 @@
                 <p class="truncated" ><a [href]="dataset.landingPage" target="_blank">{{dataset.landingPage}}</a></p>
             </span>
 
-            <span *ngIf="dataset.publisher!=undefined && dataset.publisher.name!=''" class="d-flex flex-column mb-2">
-                <label class="label">{{ 'PUBLISHER_NAME' | translate }}:</label>
-                <p class="truncated" class="truncated">{{dataset.publisher.name}}</p>
+            <span *ngFor="let publisher of dataset.publisher">
+                <span *ngIf="publisher!=undefined && publisher.name!=''" class="d-flex flex-column mb-2">
+                    <label class="label">{{ 'PUBLISHER_NAME' | translate }}:</label>
+                    <p class="truncated" class="truncated">{{publisher.name}}</p>
+                </span>
             </span>
                             
             <span *ngIf="dataset.publisher!=undefined && dataset.publisher.mbox!=''" class="d-flex flex-column mb-2">
@@ -124,9 +126,11 @@
                 <p class="truncated">{{dataset.identifier}}</p>
             </span>
 
-            <span *ngIf="dataset.rightsHolder!=undefined && dataset.rightsHolder.name!=''" class="d-flex flex-column mb-2">
-                <label class="label">{{ 'RIGHTS_HOLDER_NAME' | translate }}:</label>
-                <p class="truncated">{{dataset.rightsHolder.name}}</p>
+            <span *ngFor="let rightsHolder of dataset.rightsHolder">
+                <span *ngIf="rightsHolder!=undefined && rightsHolder.name!=''" class="d-flex flex-column mb-2">
+                    <label class="label">{{ 'RIGHTS_HOLDER_NAME' | translate }}:</label>
+                    <p class="truncated">{{rightsHolder.name}}</p>
+                </span>
             </span>
                             
             <span *ngIf="dataset.rightsHolder!=undefined && dataset.rightsHolder.mbox!=''" class="d-flex flex-column mb-2">
@@ -143,11 +147,12 @@
                 <label class="label">{{ 'RIGHTS_HOLDER_TYPE' | translate }}:</label>
                 <p class="truncated">{{dataset.rightsHolder.type}}</p>
             </span>
-            
-        
-            <span *ngIf="dataset.creator!=undefined && dataset.creator.name!=''" class="d-flex flex-column mb-2">
-                <label class="label">{{ 'CREATOR_NAME' | translate }}:</label>
-                <p class="truncated">{{dataset.creator.name}}</p>
+
+            <span *ngFor="let creator of dataset.creator">
+                <span  *ngIf="creator.name!=''" class="d-flex flex-column mb-2">
+                    <label class="label">{{ 'CREATOR_NAME' | translate }}:</label>
+                    <p class="truncated">{{creator.name}}</p>
+                </span>
             </span>
                             
             <span *ngIf="dataset.creator!=undefined && dataset.creator.mbox!=''" class="d-flex flex-column mb-2">
@@ -254,6 +259,24 @@
                         <span *ngIf="contact.hasTelephoneValue!=''">{{contact.hasTelephoneValue}}</span>
                     </nb-list-item>
                   </nb-list>                 
+            </span>
+
+            
+
+            <span *ngFor="let applicableLegislation of dataset.applicableLegislation">
+                <span *ngIf="applicableLegislation!=undefined && applicableLegislation!=''" class="d-flex flex-column mb-2">
+                    <label class="label">{{ 'APPLICABLE_LEGISLATION' | translate }}:</label>
+                    <p class="truncated" class="truncated">{{applicableLegislation}}</p>
+                </span>
+            </span>
+
+            
+
+            <span *ngFor="let HVDCategory of dataset.HVDCategory">
+                <span *ngIf="HVDCategory!=undefined && HVDCategory!=''" class="d-flex flex-column mb-2">
+                    <label class="label">{{ 'HVD_CATEGORY' | translate }}:</label>
+                    <p class="truncated" class="truncated">{{HVDCategory}}</p>
+                </span>
             </span>
 
         </nb-card-body>

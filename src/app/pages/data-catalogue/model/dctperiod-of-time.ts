@@ -4,6 +4,8 @@ export class DCTPeriodOfTime {
   uri?: string;
   startDate?: string;
   endDate?: string;
+  beginning?: string;
+  end?: string;
 
   constructor(){}
 }
