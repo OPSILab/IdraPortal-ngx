@@ -82,6 +82,11 @@ export class SearchComponent implements OnInit {
           // });
           this.searchRequest.filters.push(new SearchFilter('tags',searchParam.tags))
           this.searchDataset(true)
+        } 
+        else if(searchParam['all']!=undefined){
+          let tags = searchParam.all.split(',')
+          this.searchRequest.filters.push(new SearchFilter('ALL',searchParam.all))
+          this.searchDataset(true)
         } else{
           this.searchDataset(true)
         }
@@ -273,11 +278,16 @@ export class SearchComponent implements OnInit {
 
   onFilterRemove(filter: NbTagComponent): void {
     let tmp=filter.text.split(': ');
+    if(tmp == null || tmp.length < 2) {
+      tmp = ["ALL", filter.text];
+    }
     let name = tmp[0];
     let facetIndex = this.searchResponse.facets.findIndex(x=>x.displayName==name)
     if(facetIndex>=0){
       name=this.searchResponse.facets[facetIndex].search_parameter;
     }
+    console.log("filters: ", this.searchRequest.filters);
+    console.log("filterTags: ", this.filtersTags);
     let index = this.searchRequest.filters.findIndex(x=> x.field==name);
     let filterTag = this.searchRequest.filters[index];
     this.searchRequest.filters[index].value=filterTag.value.split(',').filter(x=> x!=tmp[1]).join(',');

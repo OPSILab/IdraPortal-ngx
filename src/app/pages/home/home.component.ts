@@ -28,6 +28,7 @@ export class HomeComponent implements OnInit {
   searchResponse:SearchResult=new SearchResult();
   searchRequest:SearchRequest=new SearchRequest();
   advancedSearch:boolean=false;
+  lastKeyPressed: string | null = null;
   searchToggleIcon:string="arrow-ios-downward-outline";
   Filters: Array<any> = [{type: 'ALL', tags: []}];
   selectableOptions: Array<string> = [];
@@ -103,18 +104,23 @@ export class HomeComponent implements OnInit {
   }
 
   onTagAddOnFilter({ value, input }: NbTagInputAddEvent, index: number): void {
-    if(input != undefined )
-      input.nativeElement.value = ''
-    if (value) {
-      this.Filters[index].tags.push(value.substring(0,value.length-1));
-    }
+    setTimeout(() => {
+      if (input != undefined)
+        input.nativeElement.value = '';
+      if (value) {
+        this.Filters[index].tags.push(value);
+        if (this.lastKeyPressed === 'Enter') {
+          this.advancedSearchReq();
+        }
+      }
+    }, 50);
   }
 
   advancedSearchReq(){
     if(!this.advancedSearch){
       this.router.navigate(['/pages/datasets'], {
         queryParams:{
-          tags: this.tagsFilter.join(','),
+          all: this.tagsFilter.join(','),
           advancedSearch: false
         }
       })
@@ -291,26 +297,17 @@ export class HomeComponent implements OnInit {
     this.tagsFilter = this.tagsFilter.filter(x => x!=tagToRemove.text);
   }
 
-  tagInputKeydown(event: KeyboardEvent): void {
-    if ((event.target as HTMLInputElement).value.charAt((event.target as HTMLInputElement).value.length-1) === ',') {
-      this.onTagAdd({ value: (event.target as HTMLInputElement).value, input: null });
-      (event.target as HTMLInputElement).value = '';
-    }
-  }
-
-  tagInputKeydownFilters(event: KeyboardEvent, i: number): void {
-    if ((event.target as HTMLInputElement).value.charAt((event.target as HTMLInputElement).value.length-1) === ',') {
-      this.onTagAddOnFilter({ value: (event.target as HTMLInputElement).value, input: null }, i);
-      (event.target as HTMLInputElement).value = '';
-    }
-  }
-
   onTagAdd({ value, input }: NbTagInputAddEvent): void {
-    if(input != undefined )
-    input.nativeElement.value = ''
-    if (value) {
-      this.tagsFilter.push(value.substring(0,value.length-1));
-    }
+    setTimeout(() => {
+      if (input != undefined)
+        input.nativeElement.value = '';
+      if (value) {
+        this.tagsFilter.push(value);
+        if (this.lastKeyPressed === 'Enter') {
+          this.advancedSearchReq();
+        }
+      }
+    }, 50);
   }
 
   randomClass(){
