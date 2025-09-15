@@ -244,15 +244,15 @@ export class HomeComponent implements OnInit {
 	// 	{value:"TECH",icon:"tech",text:"Technology"},
 	// 	{value:"TRAN",icon:"tran",text:"Transport"}];
 
-	dcatThemes=[{value:"Agriculture, fisheries, forestry and food",icon:"agri",text:"Agriculture"}, //maybe
+	dcatThemes=[{value:"Agriculture, fisheries, forestry and food",icon:"agri",text:"Agriculture"}, //maybe ?
 		{value:"Economy and finance",icon:"econ",text:"Economy"}, //ok
-		{value:"Education, culture and sport",icon:"educ",text:"Education"}, //not ok
+		{value:"Education, culture and sport",icon:"educ",text:"Education"}, //not ok -> ok
 		{value:"Energy",icon:"ener",text:"Energy"}, //ok
 		{value:"Environment",icon:"envi",text:"Environment"}, //ok
-		{value:"Government and public sector",icon:"gove",text:"Government"}, //ok 
-		{value:"Health",icon:"heal",text:"Health"}, //maybe
-		{value:"International issues",icon:"intr",text:"International"}, //maybe
-		{value:"Justice, legal system and public safety",icon:"just",text:"Justice"}, //not ok
+		{value:"Government and public sector",icon:"gove",text:"Government"}, //ok
+		{value:"Health",icon:"heal",text:"Health"}, //maybe ?
+		{value:"International issues",icon:"intr",text:"International"}, //maybe ?
+		{value:"Justice, legal system and public safety",icon:"just",text:"Justice"}, //not ok -> ok
 		{value:"Regions and cities",icon:"regi",text:"Regions"}, //ok
 		{value:"Population and society",icon:"soci",text:"Population"}, //ok
 		{value:"Science and technology",icon:"tech",text:"Technology"}, //ok
