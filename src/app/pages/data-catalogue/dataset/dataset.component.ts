@@ -272,7 +272,7 @@ export class DatasetComponent implements OnInit {
   checkDistributionFormat(format:string){
     // remove white spaces and convert to lower case
     let formatLower = format.replace(/\s/g, "").toLowerCase();
-    if(formatLower == "csv" || formatLower == "json" || formatLower == "xml" || formatLower == "geojson" || formatLower == "rdf" || formatLower == "kml" || formatLower == "pdf" || formatLower == "shp")
+    if(formatLower == "csv" || formatLower == "json" || formatLower == "xml" || formatLower == "geojson" || formatLower == "rdf" || formatLower == "kml" || formatLower == "pdf" || formatLower == "shp"  || formatLower == "txt" || formatLower == "tsv")
       return true;
     else
       return false;
