@@ -9,8 +9,9 @@ import { TranslateModule } from '@ngx-translate/core';
 
 
 @NgModule({
-  declarations: [StatisticsComponent],
+  declarations: [],
   imports: [
+    StatisticsComponent,
     CommonModule,
     StatisticsRoutingModule,
     NbCardModule,

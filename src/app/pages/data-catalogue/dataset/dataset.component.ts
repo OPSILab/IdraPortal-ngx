@@ -1,6 +1,6 @@
-import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { NbDialogService, NbToastrService } from '@nebular/theme';
+import { NbActionsModule, NbCardModule, NbDialogService, NbListModule, NbSpinnerModule, NbTagModule, NbToastrService, NbTooltipModule } from '@nebular/theme';
 import { ConfigService } from 'ngx-config-json';
 import { DataletIframeComponent } from '../datalet-iframe/datalet-iframe.component';
 import { DistributionComponent } from '../distribution/distribution.component';
@@ -12,10 +12,28 @@ import { ShowDataletsComponent } from '../show-datalets/show-datalets.component'
 import * as URLParse from 'url-parse';
 import { PreviewDialogComponent } from './preview-dialog/preview-dialog.component';
 import { GeoJsonDialogComponent } from './geojson-dialog/geojson-dialog.component';
-import { format } from 'path';
 import { RefreshService } from '../../services/refresh.service';
+import { TranslateModule } from '@ngx-translate/core';
+import { CommonModule } from '@angular/common';
+import { NgxPaginationModule } from 'ngx-pagination';
+import { MarkdownModule } from 'ngx-markdown';
 
 @Component({
+  standalone: true,
+  imports: [
+    CommonModule,
+    TranslateModule,
+    // Nebular
+    NbSpinnerModule,
+    NbCardModule,
+    NbActionsModule,
+    NbTooltipModule,
+    NbListModule,
+    NbTagModule,
+    // Third-party
+    MarkdownModule,
+    NgxPaginationModule,
+  ],
   selector: 'ngx-dataset',
   templateUrl: './dataset.component.html',
   styleUrls: ['./dataset.component.scss']
@@ -272,7 +290,7 @@ export class DatasetComponent implements OnInit {
   checkDistributionFormat(format:string){
     // remove white spaces and convert to lower case
     let formatLower = format.replace(/\s/g, "").toLowerCase();
-    if(formatLower == "csv" || formatLower == "json" || formatLower == "xml" || formatLower == "geojson" || formatLower == "rdf" || formatLower == "kml" || formatLower == "pdf" || formatLower == "shp")
+    if(formatLower == "csv" || formatLower == "json" || formatLower == "xml" || formatLower == "geojson" || formatLower == "rdf" || formatLower == "kml" || formatLower == "pdf" || formatLower == "shp"  || formatLower == "txt" || formatLower == "tsv")
       return true;
     else
       return false;

@@ -1,8 +1,10 @@
 import { Component, Input } from '@angular/core';
-import { NbDialogRef } from '@nebular/theme';
-import { CodeModel } from '@ngstack/code-editor';
+import { NbCardModule, NbDialogRef } from '@nebular/theme';
+import { CodeEditorModule, CodeModel } from '@ngstack/code-editor';
+import { TranslateModule } from '@ngx-translate/core';
 
 @Component({
+  imports: [NbCardModule, TranslateModule, CodeEditorModule],
   selector: 'ngx-editor-dialog',
   templateUrl: 'editor-dialog.component.html',
   styleUrls: ['editor-dialog.component.scss'],

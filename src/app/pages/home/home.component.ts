@@ -4,11 +4,14 @@ import { ODMSCatalogueInfo } from '../data-catalogue/model/odmscatalogue-info';
 import { SearchRequest } from '../data-catalogue/model/search-request';
 import { SearchResult } from '../data-catalogue/model/search-result';
 import { Router } from '@angular/router';
-import { NbTagComponent, NbTagInputAddEvent } from '@nebular/theme';
-import { TranslateService } from '@ngx-translate/core';
+import { NbButton, NbButtonModule, NbCheckboxModule, NbDatepickerModule, NbIconModule, NbInputModule, NbListModule, NbSelectModule, NbTabsetModule, NbTagComponent, NbTagInputAddEvent, NbTagModule, NbTooltipModule } from '@nebular/theme';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { RefreshService } from '../services/refresh.service';
+import { CommonModule } from '@angular/common';
 
 @Component({
+  standalone: true,
+  imports: [NbTagModule, NbIconModule, TranslateModule, NbTooltipModule, NbTabsetModule, NbListModule, CommonModule, NbButtonModule, NbSelectModule, NbInputModule, NbDatepickerModule, NbCheckboxModule],
   selector: 'ngx-home',
   templateUrl: './home.component.html',
   styleUrls: ['./home.component.scss']

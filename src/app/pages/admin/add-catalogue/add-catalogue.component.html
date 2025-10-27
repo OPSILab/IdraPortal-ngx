@@ -87,7 +87,7 @@
                 <div class="col-md-4">
                     <nb-card-body class="d-flex flex-column align-items-left justify-content-left">
                         <h6 class="jumbotron-heading">{{ 'ACTIVE' | translate }}</h6>
-                        <nb-select fullWidth status="primary" (selectionChange)="changedActiveHandler($event)" [(ngModel)]="node.isActive">
+                        <nb-select fullWidth status="primary" (selectionChange)="changedActiveHandler($event)" [(ngModel)]="node.isActive"  placeholder="{{ 'ACTIVE' | translate }}">
                             <nb-option *ngFor="let mode of activeMode" [value]="mode.value">
                                 {{ mode.text }}
                             </nb-option>
@@ -98,7 +98,7 @@
                 <div class="col-md-4">
                     <nb-card-body class="d-flex flex-column align-items-left justify-content-left">
                         <h6 class="jumbotron-heading">{{ 'REFRESH_PERIOD' | translate }}</h6>
-                        <nb-select fullWidth status="primary" (selectionChange)="changedRefreshHandler($event)" [(ngModel)]="node.refreshPeriod">
+                        <nb-select fullWidth status="primary" (selectionChange)="changedRefreshHandler($event)" [(ngModel)]="node.refreshPeriod" placeholder="-">
                             <nb-option *ngFor="let period of updatePeriods" [value]="period.value">
                                 {{ period.text }}
                             </nb-option>

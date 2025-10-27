@@ -14,10 +14,10 @@ import { TranslateModule } from '@ngx-translate/core';
     NbCardModule,
     NbButtonModule,
     MiscellaneousRoutingModule,
-  ],
-  declarations: [
     MiscellaneousComponent,
     NotFoundComponent,
+  ],
+  declarations: [
   ],
 })
 export class MiscellaneousModule { }

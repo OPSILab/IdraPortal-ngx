@@ -1,5 +1,5 @@
 import { Component, ElementRef, Input, ViewChild } from '@angular/core';
-import { NbDialogRef, NbToastrService } from '@nebular/theme';
+import { NbCardModule, NbDialogRef, NbSpinnerModule, NbToastrService } from '@nebular/theme';
 import { DCATDistribution } from '../../model/dcatdistribution';
 import { DataCataglogueAPIService } from '../../services/data-cataglogue-api.service';
 import * as L from "leaflet";
@@ -10,6 +10,7 @@ import JSZip from 'jszip';
 import proj4 from "proj4";
 
 @Component({
+  imports: [NbCardModule, NbSpinnerModule],
   selector: 'ngx-remoteCatalogue-dialog',
   templateUrl: 'geojson-dialog.component.html',
   styleUrls: ['geojson-dialog.component.scss'],

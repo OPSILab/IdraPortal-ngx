@@ -9,8 +9,12 @@ import { Location } from '@angular/common';
 import { NbAuthService } from '../services/auth.service';
 import { takeUntil } from 'rxjs/operators';
 import { Subject } from 'rxjs';
+import { NbCardModule, NbIconModule, NbLayoutModule } from '@nebular/theme';
+import { NbAuthModule } from '@nebular/auth';
+import { RouterModule } from '@angular/router';
 
 @Component({
+  imports: [NbLayoutModule, NbCardModule, NbIconModule, NbAuthModule, RouterModule],
   selector: 'nb-auth',
   styleUrls: ['./auth.component.scss'],
   template: `

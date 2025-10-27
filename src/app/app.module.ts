@@ -5,9 +5,9 @@
  */
 import { BrowserModule } from '@angular/platform-browser';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
-import { InjectionToken, NgModule } from '@angular/core';
+import { NgModule } from '@angular/core';
 import { HttpClientModule, HttpClient, HTTP_INTERCEPTORS, HttpHeaders } from '@angular/common/http';
-import { ConfigModule, ConfigService } from 'ngx-config-json';
+import { ConfigModule } from 'ngx-config-json';
 import { TranslateHttpLoader } from "@ngx-translate/http-loader";
 import { CoreModule } from './@core/core.module';
 import { ThemeModule } from './@theme/theme.module';
@@ -30,7 +30,7 @@ import {
   NbSidebarService
 } from '@nebular/theme';
 import { TranslateModule, TranslateLoader } from '@ngx-translate/core';
-import { NbRoleProvider, NbSecurityModule } from '@nebular/security';
+import { NbSecurityModule } from '@nebular/security';
 // import { NbPasswordAuthStrategy, NbAuthModule } from '@nebular/auth';
 import { MarkdownModule } from 'ngx-markdown';
 import { RouterModule } from '@angular/router';
@@ -69,11 +69,10 @@ export class CustomTranslateLoader implements TranslateLoader {
 }
 
 @NgModule({
-  declarations: [AppComponent, 
+  declarations: [
     // AuthLogoutComponent
   ],
   imports: [
-  
     NgxEchartsModule.forRoot({
       echarts: () => import('echarts')
     }),
@@ -259,9 +258,7 @@ export class CustomTranslateLoader implements TranslateLoader {
       multi: true,
     },
     JwtHelperService,
-   
-  ],
-  bootstrap: [AppComponent],
+  ]
 })
 export class AppModule {
 }

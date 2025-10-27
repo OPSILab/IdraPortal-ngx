@@ -1,9 +1,22 @@
 import { Component, OnInit } from '@angular/core';
 import { CataloguesService } from './catalogues.service';
-import { TranslateService } from '@ngx-translate/core';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { RefreshService } from '../services/refresh.service';
+import { NbCardModule, NbIconModule, NbListModule, NbSelectModule, NbSpinnerModule, NbTooltipModule } from '@nebular/theme';
+import { CommonModule } from '@angular/common';
+import { RouterModule } from '@angular/router';
 
 @Component({
+  imports: [
+    CommonModule,
+    TranslateModule,
+    NbCardModule,
+    NbSelectModule,
+    NbSpinnerModule,
+    NbListModule,
+    NbIconModule,
+    NbTooltipModule,
+  RouterModule ],
   selector: 'ngx-catalogues',
   templateUrl: './catalogues.component.html',
   styleUrls: ['./catalogues.component.scss']

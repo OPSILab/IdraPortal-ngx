@@ -10,8 +10,11 @@ import { TranslateModule } from '@ngx-translate/core';
 
 
 @NgModule({
-  declarations: [InfoComponent, SiteComponent, AboutComponent],
+  declarations: [],
   imports: [
+    InfoComponent, 
+    SiteComponent, 
+    AboutComponent,
     CommonModule,
     AboutRoutingModule,
     NbCardModule,

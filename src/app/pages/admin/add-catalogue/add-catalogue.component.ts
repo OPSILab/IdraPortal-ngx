@@ -1,13 +1,14 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { CataloguesServiceService } from '../catalogues-service.service';
-import { SharedService } from '../../services/shared.service';
 import { DomSanitizer} from '@angular/platform-browser';
-import { NbDialogService, NbToastrService } from '@nebular/theme';
-import { TranslateService } from '@ngx-translate/core';
+import { NbButtonModule, NbCardModule, NbDialogService, NbInputModule, NbSelectModule, NbSpinnerModule, NbToastrService } from '@nebular/theme';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { RefreshService } from '../../services/refresh.service';
-import { PrefixDialogComponent } from '../admin-configurations/dialog/prefix-dialog/prefix-dialog.component';
 import { EditorDialogComponent } from './dialog/editor-dialog/editor-dialog.component';
+import { CodeEditorModule } from '@ngstack/code-editor';
+import { FormsModule } from '@angular/forms';
+import { CommonModule } from '@angular/common';
 
 export interface Node {
 	id : string ;
@@ -59,6 +60,7 @@ export interface Node {
 }
 
 @Component({
+  imports: [NbCardModule, TranslateModule, CodeEditorModule, NbSpinnerModule, NbSelectModule, FormsModule, NbButtonModule, NbInputModule, CommonModule],
   selector: 'ngx-add-catalogue',
   templateUrl: './add-catalogue.component.html',
   styleUrls: ['./add-catalogue.component.scss']

@@ -12,8 +12,10 @@ import { TranslateModule } from '@ngx-translate/core';
 
 
 @NgModule({
-  declarations: [SparqlComponent, NgdCodeBlockComponent],
+  declarations: [],
   imports: [
+    SparqlComponent, 
+    NgdCodeBlockComponent,
     CommonModule,
     TranslateModule,
     SparqlRoutingModule,

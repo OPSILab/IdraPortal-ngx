@@ -8,8 +8,9 @@ import { TranslateModule } from '@ngx-translate/core';
 
 
 @NgModule({
-  declarations: [CataloguesComponent],
+  declarations: [],
   imports: [
+    CataloguesComponent,
     CommonModule,
     TranslateModule,
     CataloguesRoutingModule,

@@ -9,8 +9,12 @@ import { NbAuthOAuth2JWTToken, NbAuthService } from '@nebular/auth';
 import { TranslateService } from '@ngx-translate/core';
 import { MenuItem } from './menu-item';
 import { SharedService } from './services/shared.service';
+import { RouterOutlet } from '@angular/router';
+import { OneColumnLayoutComponent } from '../@theme/layouts';
+import { NbMenuModule } from '@nebular/theme';
 
 @Component({
+  imports: [RouterOutlet, OneColumnLayoutComponent, NbMenuModule],
   selector: 'ngx-pages',
   styleUrls: ['pages.component.scss'],
   template: `

@@ -10,7 +10,10 @@ import { environment } from '../environments/environment';
 import { NbAuthOAuth2JWTToken, NbOAuth2AuthStrategy, NbOAuth2ClientAuthMethod, NbOAuth2GrantType, NbOAuth2ResponseType } from '@nebular/auth';
 import { OidcJWTToken } from './pages/auth/oidc/oidc';
 import { NbPasswordAuthStrategy } from './@theme/components/auth/public_api';
+import { RouterOutlet } from '@angular/router';
 @Component({
+  standalone: true,
+  imports: [RouterOutlet],
   selector: 'ngx-app',
   template: '<router-outlet></router-outlet>',
 })

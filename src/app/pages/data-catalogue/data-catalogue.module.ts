@@ -6,7 +6,7 @@ import { DataCatalogueRoutingModule } from './data-catalogue-routing.module';
 import { SearchComponent } from './search/search.component';
 import { DatasetComponent } from './dataset/dataset.component';
 import { DataCatalogueComponent } from './data-catalogue.component';
-import { NbAccordionModule, NbActionsModule, NbButton, NbButtonModule, NbCardModule, NbCheckboxModule, NbDialogModule, NbFormFieldModule, NbIconModule, NbInputModule, NbListModule, NbSelectModule, NbSpinnerModule, NbTagModule, NbToastrModule, NbTooltipModule } from '@nebular/theme';
+import { NbAccordionModule, NbActionsModule, NbButtonModule, NbCardModule, NbCheckboxModule, NbDialogModule, NbFormFieldModule, NbIconModule, NbInputModule, NbListModule, NbSelectModule, NbSpinnerModule, NbTagModule, NbToastrModule, NbTooltipModule } from '@nebular/theme';
 import { DistributionComponent } from './distribution/distribution.component';
 import { MarkdownModule } from 'ngx-markdown';
 import { DataletIframeComponent } from './datalet-iframe/datalet-iframe.component';
@@ -16,8 +16,16 @@ import { GeoJsonDialogComponent } from './dataset/geojson-dialog/geojson-dialog.
 import { NgxPaginationModule } from 'ngx-pagination';
 import { TranslateModule } from '@ngx-translate/core';
 @NgModule({
-  declarations: [DataCatalogueComponent, SearchComponent, DatasetComponent, DistributionComponent, DataletIframeComponent, ShowDataletsComponent, PreviewDialogComponent, GeoJsonDialogComponent],
+  declarations: [],
   imports: [
+    DataCatalogueComponent, 
+    SearchComponent, 
+    DatasetComponent, 
+    DistributionComponent, 
+    DataletIframeComponent, 
+    ShowDataletsComponent, 
+    PreviewDialogComponent, 
+    GeoJsonDialogComponent,
     NgxPaginationModule,
     ThemeModule,
     TranslateModule,

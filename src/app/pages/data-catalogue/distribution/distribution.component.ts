@@ -1,10 +1,11 @@
 import { Component, Input, OnInit } from '@angular/core';
-import { NbDialogRef } from '@nebular/theme';
+import { NbCardModule, NbDialogRef } from '@nebular/theme';
 import { DCATDistribution } from '../model/dcatdistribution';
 import { DCTStandard } from '../model/dctstandard';
 import { SKOSConcept } from '../model/skosconcept';
 
 @Component({
+  imports: [NbCardModule],
   selector: 'ngx-distribution',
   templateUrl: './distribution.component.html',
   styleUrls: ['./distribution.component.scss']

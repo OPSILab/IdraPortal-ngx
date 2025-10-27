@@ -3,9 +3,12 @@ import * as echarts from 'echarts';
 import { CoolTheme } from './cool-theme';
 import { StatisticsService } from './statistics.service';
 import { RefreshService } from '../services/refresh.service';
-import { TranslateService } from '@ngx-translate/core';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
+import { NbSelectModule } from '@nebular/theme';
+import { NgxEchartsModule } from 'ngx-echarts';
 
 @Component({
+  imports: [TranslateModule, NbSelectModule, NgxEchartsModule],
   selector: 'ngx-statistics',
   templateUrl: './statistics.component.html',
   styleUrls: ['./statistics.component.scss']

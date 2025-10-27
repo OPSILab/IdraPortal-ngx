@@ -12,10 +12,16 @@ import { CustomTranslateLoader } from '../../app.module';
 import { HttpClient } from '@angular/common/http';
 
 @NgModule({
-  schemas: [CUSTOM_ELEMENTS_SCHEMA,NO_ERRORS_SCHEMA],
-  declarations: [MqaComponent, FsIconComponent, FsIconComponentCat],
+  schemas: [CUSTOM_ELEMENTS_SCHEMA, NO_ERRORS_SCHEMA],
+  declarations: [],
   imports: [
+    // Standalone components imported directly
+    MqaComponent,
+    FsIconComponent,
+    FsIconComponentCat,
+    // Feature routing
     MqaRoutingModule,
+    // Common utilities and UI modules used in templates
     CommonModule,
     TranslateModule,
     NbCardModule,
@@ -28,10 +34,7 @@ import { HttpClient } from '@angular/common/http';
     NgxEchartsModule,
     NbTreeGridModule,
     NbTableModule,
-    ThemeModule,
-    NbToastrModule.forRoot(),
-    NbDialogModule.forRoot(),
     NbTooltipModule,
-  ]
+  ],
 })
 export class MqaModule { }

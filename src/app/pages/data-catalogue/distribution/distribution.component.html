@@ -50,7 +50,7 @@
         </span>
         
         <span *ngIf="distribution.language!=undefined && (distribution.language.length>1 || (distribution.language.length==1 && distribution.language[0]!='' && distribution.language[0]!=undefined ))" class="d-flex flex-column mb-2">
-            <label class="label">{{ 'LANGUAGES' | translate }}Languages:</label>
+            <label class="label">{{ 'LANGUAGES' | translate }}:</label>
             <p class="truncated">{{distribution.language.join(',')}}</p>
         </span>
 

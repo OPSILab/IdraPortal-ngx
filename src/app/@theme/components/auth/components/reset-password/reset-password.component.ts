@@ -11,7 +11,11 @@ import { getDeepFromObject } from '../../helpers';
 import { NbAuthService } from '../../services/auth.service';
 import { NbAuthResult } from '../../services/auth-result';
 
+import { FormsModule } from '@angular/forms';
+import { NbButtonModule, NbInputModule } from '@nebular/theme';
+
 @Component({
+  imports: [FormsModule, NbInputModule, NbButtonModule],
   selector: 'nb-reset-password-page',
   styleUrls: ['./reset-password.component.scss'],
   templateUrl: './reset-password.component.html',

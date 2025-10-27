@@ -1,9 +1,11 @@
 import { Component, OnInit } from '@angular/core';
-import { NbDialogRef } from '@nebular/theme';
+import { NbCardModule, NbDialogRef, NbSelectModule } from '@nebular/theme';
 import { Datalet } from '../model/datalet';
 import { DataCataglogueAPIService } from '../services/data-cataglogue-api.service';
+import { SafeHtmlPipe } from '../../../@theme/pipes';
 
 @Component({
+  imports: [NbCardModule, NbSelectModule, SafeHtmlPipe],
   selector: 'ngx-show-datalets',
   templateUrl: './show-datalets.component.html',
   styleUrls: ['./show-datalets.component.scss']

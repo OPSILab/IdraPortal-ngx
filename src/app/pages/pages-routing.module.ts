@@ -8,7 +8,7 @@ import {
   NbLoginComponent as NebularLoginComponent,
   NbLogoutComponent as NebularLogoutComponent
 } from '@nebular/auth';
-import { NbAuthComponent, NbLoginComponent, NbLogoutComponent } from '../@theme/components/auth/public_api';
+import { NbAuthComponent, NbLoginComponent, NbLogoutComponent, NbRegisterComponent } from '../@theme/components/auth/public_api';
 
 const routes: Routes = [{
   path: '',
@@ -81,7 +81,7 @@ const routes: Routes = [{
             {
               path: 'logout',
               component: NbLogoutComponent,
-            },
+            }
           ]},
     
     

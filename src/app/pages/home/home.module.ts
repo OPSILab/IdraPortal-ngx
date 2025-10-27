@@ -10,8 +10,9 @@ import { TranslateModule } from '@ngx-translate/core';
 
 
 @NgModule({
-  declarations: [HomeComponent],
+  declarations: [],
   imports: [
+    HomeComponent,
     CommonModule,
     TranslateModule,
     HomeRoutingModule,

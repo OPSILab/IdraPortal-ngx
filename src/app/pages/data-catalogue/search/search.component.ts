@@ -1,5 +1,7 @@
 import { Component, OnInit, ElementRef } from '@angular/core';
-import { NbTagComponent, NbTagInputAddEvent } from '@nebular/theme';
+import { NbCardModule, NbSpinnerModule, NbTagComponent, NbTagInputAddEvent, NbTagModule, NbListModule, NbIconModule, NbCheckboxModule, NbTooltipModule } from '@nebular/theme';
+import { NgxPaginationModule } from 'ngx-pagination';
+import { NbEvaIconsModule } from '@nebular/eva-icons';
 import { DCATDataset,FormatCount } from '../model/dcatdataset';
 import { ODMSCatalogueInfo } from '../model/odmscatalogue-info';
 import { SearchFacet } from '../model/search-facet';
@@ -9,9 +11,28 @@ import { SearchResult } from '../model/search-result';
 import { DataCataglogueAPIService } from '../services/data-cataglogue-api.service';
 import { Router } from '@angular/router';
 import { Observable } from 'rxjs';
-import { TranslateService } from '@ngx-translate/core';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
+import { CommonModule } from '@angular/common';
+import { RouterModule } from '@angular/router';
 
 @Component({
+  standalone: true,
+  imports: [
+    CommonModule,
+    TranslateModule,
+    RouterModule,
+    // Nebular UI modules used in template
+    NbCardModule,
+    NbSpinnerModule,
+    NbTagModule,
+    NbListModule,
+    NbIconModule,
+    NbCheckboxModule,
+    NbTooltipModule,
+    NbEvaIconsModule,
+    // Third-party
+    NgxPaginationModule,
+  ],
   selector: 'ngx-search',
   templateUrl: './search.component.html',
   styleUrls: ['./search.component.scss']
@@ -41,8 +62,16 @@ export class SearchComponent implements OnInit {
   filtersTags: Array<string>= [];
   isHVD_Dataset = false;
 
+  ngOnDestroy() {
+  }
+
   ngOnInit(): void { 
-    this.searchResponse.facets = [];
+    // Ensure stable defaults before first render
+    this.searchRequest.rows = this.searchRequest.rows || 10;
+    this.searchRequest.start = this.searchRequest.start || 0;
+    this.searchResponse.facets = this.searchResponse.facets || [];
+    (this.searchResponse as any).results = (this.searchResponse as any).results || [];
+    (this.searchResponse as any).count = (this.searchResponse as any).count || 0;
     this.loading=true
     this.restApi.getCataloguesInfo().subscribe(infos =>{
       this.cataloguesInfos = infos;

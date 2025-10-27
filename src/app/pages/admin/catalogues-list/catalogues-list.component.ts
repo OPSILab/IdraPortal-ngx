@@ -1,17 +1,19 @@
 import { Component, OnInit } from '@angular/core';
-import { NbDialogService, NbSortDirection, NbSortRequest, NbTreeGridDataSource, NbTreeGridDataSourceBuilder } from '@nebular/theme';
+import { NbDialogService, NbIconModule, NbInputModule, NbSortDirection, NbSortRequest, NbToggleModule, NbTooltipModule, NbTreeGridDataSource, NbTreeGridDataSourceBuilder, NbTreeGridModule } from '@nebular/theme';
 import { CataloguesServiceService } from '../catalogues-service.service';
 import { ODMSCatalogue } from '../../data-catalogue/model/odmscatalogue';
 
 import { Output, EventEmitter} from '@angular/core';
-import {formatDate } from '@angular/common';
+import {CommonModule, formatDate } from '@angular/common';
 import { ShowcaseDialogComponent } from './dialog/showcase-dialog/showcase-dialog.component';
-import { Router } from '@angular/router';
+import { Router, RouterModule } from '@angular/router';
 import { SharedService } from '../../services/shared.service';
 import { ODMSCatalogueComplete } from '../../data-catalogue/model/odmscataloguecomplete';
 import { RefreshService } from '../../services/refresh.service';
 import { TranslateService } from '@ngx-translate/core';
 import { ConfigService } from 'ngx-config-json';
+import { NbCardModule } from '@nebular/theme';
+import { TranslateModule } from '@ngx-translate/core';
 
 
 interface TreeNode<T> {
@@ -40,6 +42,7 @@ interface FSEntry {
 
 
 @Component({
+  imports: [NbCardModule, TranslateModule, NbTreeGridModule, NbInputModule, NbToggleModule, NbIconModule, NbTooltipModule, RouterModule, CommonModule],
   selector: 'ngx-catalogues-list',
   templateUrl: './catalogues-list.component.html',
   styleUrls: ['./catalogues-list.component.scss']

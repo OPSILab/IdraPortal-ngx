@@ -24,9 +24,18 @@ import { CodeEditorModule } from '@ngstack/code-editor';
 
 
 @NgModule({
-  declarations: [CataloguesListComponent, AddCatalogueComponent, RemoteCataloguesComponent, DataletsManagementComponent, ShowcaseDialogComponent, AdminConfigurationsComponent, PrefixDialogComponent, RemoteCatalogueDialogComponent, DataletDialogComponent, EditorDialogComponent],
-  
-imports: [
+  declarations: [],
+  imports: [
+    CataloguesListComponent, 
+    AddCatalogueComponent, 
+    RemoteCataloguesComponent, 
+    DataletsManagementComponent, 
+    ShowcaseDialogComponent, 
+    AdminConfigurationsComponent, 
+    PrefixDialogComponent, 
+    RemoteCatalogueDialogComponent, 
+    DataletDialogComponent, 
+    EditorDialogComponent,
     CommonModule,
     TranslateModule,
     AdminRoutingModule,

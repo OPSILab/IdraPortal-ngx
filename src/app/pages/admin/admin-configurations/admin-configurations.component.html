@@ -9,7 +9,7 @@
               <nb-card class="minicard">
                 <nb-card-body class="d-flex flex-column align-items-left justify-content-left">
                   <h6 class="jumbotron-heading">{{ 'ADMIN_CATALOG_REFRESH_PERIOD' | translate }}</h6>
-                  <nb-select placeholder="-" [(ngModel)]="refreshPeriod" [selected]="refreshPeriod">
+                  <nb-select  [(ngModel)]="refreshPeriod" [selected]="refreshPeriod">
                     <nb-option value="3600">{{ 'ADMIN_CATALOG_REFRESH_1H' | translate }}</nb-option>
                     <nb-option value="86400">{{ 'ADMIN_CATALOG_REFRESH_1D' | translate }}</nb-option>
                     <nb-option value="604800">{{ 'ADMIN_CATALOG_REFRESH_1W' | translate }}</nb-option>

@@ -1,12 +1,12 @@
 import { Component, OnInit } from '@angular/core';
-import { NbSortDirection, NbSortRequest, NbTreeGridDataSource, NbTreeGridDataSourceBuilder } from '@nebular/theme';
+import { NbActionsModule, NbButtonModule, NbCardModule, NbInputModule, NbSelectModule, NbSortDirection, NbSortRequest, NbTreeGridDataSource, NbTreeGridDataSourceBuilder, NbTreeGridModule } from '@nebular/theme';
 import { CataloguesServiceService } from '../catalogues-service.service';
 import { ODMSCatalogueInfo } from '../../data-catalogue/model/odmscatalogue-info';
 import { ODMSCatalogue } from '../../data-catalogue/model/odmscatalogue';
 
 import * as remoteCatalogueData from '../../../../assets/remoteCatalogues.json';
-import { Router } from '@angular/router';
-import { TranslateService } from '@ngx-translate/core';
+import { Router, RouterModule } from '@angular/router';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { RefreshService } from '../../services/refresh.service';
 
 
@@ -28,9 +28,10 @@ interface FSEntry {
 
 
 @Component({
-  selector: 'ngx-remote-catalogues',
-  templateUrl: './remote-catalogues.component.html',
-  styleUrls: ['./remote-catalogues.component.scss']
+	imports: [NbCardModule, TranslateModule, NbTreeGridModule, NbSelectModule, NbInputModule, RouterModule, NbActionsModule, NbButtonModule],
+	selector: 'ngx-remote-catalogues',
+	templateUrl: './remote-catalogues.component.html',
+	styleUrls: ['./remote-catalogues.component.scss']
 })
 export class RemoteCataloguesComponent implements OnInit {
 	

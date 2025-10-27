@@ -6,13 +6,17 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { CataloguesServiceService } from '../catalogues-service.service';
 import { SharedService } from '../../services/shared.service';
 import { DomSanitizer } from '@angular/platform-browser';
-import { NbDialogService, NbSortDirection, NbSortRequest, NbTreeGridDataSource, NbTreeGridDataSourceBuilder } from '@nebular/theme';
+import { NbAccordionModule, NbButtonModule, NbCheckboxModule, NbDialogService, NbIconModule, NbInputModule, NbSortDirection, NbSortRequest, NbTreeGridDataSource, NbTreeGridDataSourceBuilder, NbTreeGridModule } from '@nebular/theme';
 
 import { Md5 } from 'ts-md5';
 import { PrefixDialogComponent } from './dialog/prefix-dialog/prefix-dialog.component';
 import { RemoteCatalogueDialogComponent } from './dialog/remoteCatalogue-dialog/remoteCatalogue-dialog.component';
 import { RefreshService } from '../../services/refresh.service';
 import { TranslateService } from '@ngx-translate/core';
+import { FormsModule } from '@angular/forms';
+import { NbCardModule, NbDialogRef, NbSelectModule } from '@nebular/theme';
+import { TranslateModule } from '@ngx-translate/core';
+import { CommonModule } from '@angular/common';
 
 interface TreeNode<T> {
   data: T;
@@ -40,7 +44,9 @@ interface FSEntryCat {
 }
 
 
+
 @Component({
+  imports: [NbCardModule, TranslateModule, FormsModule, NbSelectModule, NbAccordionModule, NbTreeGridModule, NbCheckboxModule, NbButtonModule, NbAccordionModule, CommonModule, NbInputModule, NbIconModule],
   selector: 'ngx-admin-configurations',
   templateUrl: './admin-configurations.component.html',
   styleUrls: ['./admin-configurations.component.scss']

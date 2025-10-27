@@ -1,9 +1,12 @@
 import { Component, OnInit } from '@angular/core';
-import { NbDialogService, NbSortDirection, NbSortRequest, NbTreeGridDataSource, NbTreeGridDataSourceBuilder } from '@nebular/theme';
+import { NbButtonModule, NbDialogService, NbIconModule, NbSortDirection, NbSortRequest, NbTreeGridDataSource, NbTreeGridDataSourceBuilder, NbTreeGridModule } from '@nebular/theme';
 import { CataloguesServiceService } from '../catalogues-service.service';
 import { DataletDialogComponent } from './dialog/datalet-dialog.component';
 import { RefreshService } from '../../services/refresh.service';
-import { TranslateService } from '@ngx-translate/core';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
+import { NbCardModule } from '@nebular/theme';
+import { RouterModule } from '@angular/router';
+import { CommonModule } from '@angular/common';
 
 interface TreeNode<T> {
   data: T;
@@ -26,6 +29,7 @@ interface FSEntry {
   
 
 @Component({
+  imports: [NbCardModule, NbTreeGridModule, TranslateModule, NbButtonModule, RouterModule, NbIconModule, CommonModule, ],
   selector: 'ngx-datalets-management',
   templateUrl: './datalets-management.component.html',
   styleUrls: ['./datalets-management.component.scss']

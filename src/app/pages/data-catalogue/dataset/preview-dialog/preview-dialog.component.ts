@@ -1,7 +1,9 @@
 import { Component, Input } from '@angular/core';
-import { NbDialogRef } from '@nebular/theme';
+import { NbButtonModule, NbCardModule, NbDialogRef, NbSpinnerModule } from '@nebular/theme';
+import { TranslateModule } from '@ngx-translate/core';
 
 @Component({
+  imports: [NbSpinnerModule, NbCardModule, TranslateModule, NbButtonModule],
   selector: 'ngx-remoteCatalogue-dialog',
   templateUrl: 'preview-dialog.component.html',
   styleUrls: ['preview-dialog.component.scss'],
