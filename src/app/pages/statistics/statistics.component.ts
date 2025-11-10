@@ -1,14 +1,15 @@
 import { Component, OnInit } from '@angular/core';
-import * as echarts from 'echarts';
+import type { EChartsCoreOption as EChartsOption } from 'echarts/core';
 import { CoolTheme } from './cool-theme';
-import { StatisticsService } from './statistics.service';
-import { RefreshService } from '../services/refresh.service';
+import { StatisticsService } from '../services/statistics.service';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { NbSelectModule } from '@nebular/theme';
 import { NgxEchartsModule } from 'ngx-echarts';
+import { CommonModule } from '@angular/common';
 
 @Component({
-  imports: [TranslateModule, NbSelectModule, NgxEchartsModule],
+  standalone: true,
+  imports: [TranslateModule, NbSelectModule, NgxEchartsModule, CommonModule],
   selector: 'ngx-statistics',
   templateUrl: './statistics.component.html',
   styleUrls: ['./statistics.component.scss']
@@ -18,10 +19,9 @@ export class StatisticsComponent implements OnInit {
   constructor(
     private statisticsService : StatisticsService,
     public translation: TranslateService,
-        private refreshService: RefreshService,
   ) { }
 
-  options: echarts.EChartsOption = {
+  options: EChartsOption = {
     legend: {},
     tooltip: {},
     // Declare an x-axis (category axis).
@@ -34,7 +34,7 @@ export class StatisticsComponent implements OnInit {
     series: [{ type: 'bar' }],
   };
 
-  optionsMostActive: echarts.EChartsOption = {
+  optionsMostActive: EChartsOption = {
     legend: {},
     tooltip: {},
     // Declare an x-axis (category axis).
@@ -48,7 +48,7 @@ export class StatisticsComponent implements OnInit {
   };
 
   
-  optionsCircle: echarts.EChartsOption = {
+  optionsCircle: EChartsOption = {
     tooltip: {
       trigger: 'item',
       formatter: '{a} <br/>{b} : {c} ({d}%)',
@@ -68,18 +68,34 @@ export class StatisticsComponent implements OnInit {
     ],
   };
 
-  dataMostActive: echarts.EChartsOption;
-  dataTop10: echarts.EChartsOption;
-  dataTechnologies: echarts.EChartsOption;
-  dataThemes: echarts.EChartsOption;
-  dataFormats: echarts.EChartsOption;
-  dataLicenses: echarts.EChartsOption;
+  dataMostActive: EChartsOption;
+  dataTop10: EChartsOption;
+  dataTechnologies: EChartsOption;
+  dataThemes: EChartsOption;
+  dataFormats: EChartsOption;
+  dataLicenses: EChartsOption;
   coolTheme = CoolTheme;
 
   catalogueList: Array<any> = [];
   selectedCatalogues: Array<number> = [0];
   dateInterval: any = [new Date(), new Date(new Date().getTime() - 8*24*60*60*1000)];
   selectedInterval: number = 0;
+
+  onCataloguesChange(selected: number[] | number): void {
+    // Normalize selected values for multiple select
+    if (Array.isArray(selected)) {
+      this.selectedCatalogues = selected as number[];
+    } else if (typeof selected === 'number') {
+      const set = new Set(this.selectedCatalogues);
+      if (set.has(selected)) {
+        set.delete(selected);
+      } else {
+        set.add(selected);
+      }
+      this.selectedCatalogues = Array.from(set);
+    }
+    this.getStatistics();
+  }
 
   getStatistics(): void {
     if(this.selectedInterval == 0){
@@ -93,15 +109,12 @@ export class StatisticsComponent implements OnInit {
     let startDate = this.dateInterval[1].toISOString();
     let endDate = this.dateInterval[0].toISOString();
 
-    let slcCatalogues = [];
-    if(this.selectedCatalogues.includes(0)){
-      this.catalogueList.forEach((element, index) => {
-        slcCatalogues.push(element.id);
-      });
-    }
+    // Compute selected catalogues: if 'All' (0) is selected, use all IDs; otherwise, use explicit selection
+    const slcCatalogues: number[] = this.selectedCatalogues.includes(0)
+      ? this.catalogueList.map(c => c.id)
+      : [...this.selectedCatalogues];
     
     this.statisticsService.getStatistics(startDate, endDate, slcCatalogues ).then((data)=>{
-      
       let dataTop10 = { dataset: { source: [['Datasets', 'Datasets'] ] } };
       (data.cataloguesStatistics.datasetCountStatistics).forEach((element, index) => {
         dataTop10.dataset.source.push([element.name, element.datasetCount]);
@@ -142,8 +155,6 @@ export class StatisticsComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.refreshService.refreshPageOnce('admin-configuration');
-
     this.statisticsService.getCatalogueList().then((data)=>{
       this.catalogueList = data;
       this.getStatistics();

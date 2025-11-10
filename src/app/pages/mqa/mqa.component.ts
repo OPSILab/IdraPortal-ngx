@@ -1,14 +1,12 @@
-import { Component, Input, OnInit, ElementRef, OnDestroy, ViewChild } from '@angular/core';
+import { Component, Input, OnInit, ElementRef, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MqaService } from '../services/mqa.service';
 import { NbAccordionModule, NbButtonModule, NbCardModule, NbFormFieldModule, NbIconModule, NbInputModule, NbSortDirection, NbSortRequest, NbTableModule, NbThemeService, NbTooltipModule, NbTreeGridDataSource, NbTreeGridDataSourceBuilder, NbTreeGridModule, NbUserModule } from '@nebular/theme';
 import { NgxEchartsModule } from 'ngx-echarts';
 import { delay } from 'rxjs/operators';
 import {FormControl, FormGroup, Validators, ReactiveFormsModule} from '@angular/forms';
-import { RefreshService } from '../services/refresh.service';
 import * as echarts from 'echarts';
-import { TranslateModule, TranslateService } from '@ngx-translate/core';
-import { MqaRoutingModule } from './mqa-routing.module';
+import { TranslateModule } from '@ngx-translate/core';
 
 interface TreeNode<T> {
   data: T;
@@ -108,8 +106,6 @@ export class MqaComponent implements OnInit {
   constructor(
     private mqaService : MqaService,
     private theme: NbThemeService,
-    private refreshService: RefreshService,
-    public translation: TranslateService,
     private dataSourceBuilder: NbTreeGridDataSourceBuilder<FSEntry>, //table catalogue score
     private dataSourceBuilder_dat: NbTreeGridDataSourceBuilder<FSEntryDataset>, //table dataset score
     private dataSourceBuilder_list: NbTreeGridDataSourceBuilder<FSEntryListCat> //table list of catalogues and datasets
@@ -124,7 +120,6 @@ export class MqaComponent implements OnInit {
 
   file: File | null = null;
   ngOnInit(): void {
-    this.refreshService.refreshPageOnce('admin-configuration');
     this.loadList();
   }
 

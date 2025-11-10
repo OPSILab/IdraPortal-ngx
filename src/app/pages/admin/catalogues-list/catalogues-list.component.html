@@ -79,7 +79,7 @@
             <td nbTreeGridCell *nbTreeGridCellDef="let row" class="hid">{{ row.data[defaultColumns[8]] }}</td>
           </ng-container>
   
-          <ng-container [nbTreeGridColumnDef]="defaultColumns[9]" *ngIf="CB_enabled == true">
+          <ng-container [nbTreeGridColumnDef]="defaultColumns[9]" *ngIf="CB_enabled">
             <th nbTreeGridHeaderCell [nbSortHeader]="getSortDirection(defaultColumns[9])" *nbTreeGridHeaderCellDef class="col-w-70">{{ 'CATALOGUE_LIST_CB' | translate }}</th>
             <td nbTreeGridCell *nbTreeGridCellDef="let row">
               <ng-template #offline >

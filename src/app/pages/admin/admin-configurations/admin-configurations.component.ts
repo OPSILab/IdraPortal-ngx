@@ -1,20 +1,12 @@
 import { Component, OnInit } from '@angular/core';
-import { ActivatedRoute, Router } from '@angular/router';
-
-
-//)import { CataloguesListComponent } from '../catalogues-list/catalogues-list.component';
-import { CataloguesServiceService } from '../catalogues-service.service';
-import { SharedService } from '../../services/shared.service';
-import { DomSanitizer } from '@angular/platform-browser';
+import { CataloguesServiceService } from '../../services/catalogues-service.service';
 import { NbAccordionModule, NbButtonModule, NbCheckboxModule, NbDialogService, NbIconModule, NbInputModule, NbSortDirection, NbSortRequest, NbTreeGridDataSource, NbTreeGridDataSourceBuilder, NbTreeGridModule } from '@nebular/theme';
-
 import { Md5 } from 'ts-md5';
 import { PrefixDialogComponent } from './dialog/prefix-dialog/prefix-dialog.component';
 import { RemoteCatalogueDialogComponent } from './dialog/remoteCatalogue-dialog/remoteCatalogue-dialog.component';
-import { RefreshService } from '../../services/refresh.service';
 import { TranslateService } from '@ngx-translate/core';
 import { FormsModule } from '@angular/forms';
-import { NbCardModule, NbDialogRef, NbSelectModule } from '@nebular/theme';
+import { NbCardModule, NbSelectModule } from '@nebular/theme';
 import { TranslateModule } from '@ngx-translate/core';
 import { CommonModule } from '@angular/common';
 
@@ -46,6 +38,7 @@ interface FSEntryCat {
 
 
 @Component({
+  standalone: true,
   imports: [NbCardModule, TranslateModule, FormsModule, NbSelectModule, NbAccordionModule, NbTreeGridModule, NbCheckboxModule, NbButtonModule, NbAccordionModule, CommonModule, NbInputModule, NbIconModule],
   selector: 'ngx-admin-configurations',
   templateUrl: './admin-configurations.component.html',
@@ -57,12 +50,7 @@ export class AdminConfigurationsComponent implements OnInit {
 
   constructor(private dataSourceBuilder: NbTreeGridDataSourceBuilder<FSEntry>,
     private dataSourceBuilderCat: NbTreeGridDataSourceBuilder<FSEntryCat>,
-    private router: Router,
     private restApi: CataloguesServiceService,
-    private route: ActivatedRoute,
-    private sharedService: SharedService,
-    private refreshService: RefreshService,
-    private sanitizer: DomSanitizer,
     public translation: TranslateService,
     private dialogService: NbDialogService) { }
 
@@ -100,7 +88,6 @@ export class AdminConfigurationsComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.refreshService.refreshPageOnce('admin-configuration');
     this.restApi.getConfigurationManagement().subscribe((data: any) => {
       console.log(data);
       this.refreshPeriod = data.refresh_period;

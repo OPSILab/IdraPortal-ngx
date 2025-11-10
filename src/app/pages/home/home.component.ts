@@ -6,7 +6,6 @@ import { SearchResult } from '../data-catalogue/model/search-result';
 import { Router } from '@angular/router';
 import { NbButton, NbButtonModule, NbCheckboxModule, NbDatepickerModule, NbIconModule, NbInputModule, NbListModule, NbSelectModule, NbTabsetModule, NbTagComponent, NbTagInputAddEvent, NbTagModule, NbTooltipModule } from '@nebular/theme';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
-import { RefreshService } from '../services/refresh.service';
 import { CommonModule } from '@angular/common';
 
 @Component({
@@ -20,8 +19,7 @@ export class HomeComponent implements OnInit {
 
   constructor(private restApi:DataCataglogueAPIService,
     private router: Router,
-    public translation: TranslateService,
-        private refreshService: RefreshService,
+    public translation: TranslateService
   ) { }
 
   cataloguesInfos: Array<ODMSCatalogueInfo>=[]
@@ -263,8 +261,6 @@ export class HomeComponent implements OnInit {
 
     
   ngOnInit(): void {
-    this.refreshService.refreshPageOnce('admin-configuration');
-    
     this.restApi.getCataloguesInfo().subscribe(infos =>{
       this.cataloguesInfos = infos;
       this.searchRequest.nodes = infos.map(x=>x.id)

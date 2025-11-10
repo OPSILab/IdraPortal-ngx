@@ -12,7 +12,6 @@ import { ShowDataletsComponent } from '../show-datalets/show-datalets.component'
 import * as URLParse from 'url-parse';
 import { PreviewDialogComponent } from './preview-dialog/preview-dialog.component';
 import { GeoJsonDialogComponent } from './geojson-dialog/geojson-dialog.component';
-import { RefreshService } from '../../services/refresh.service';
 import { TranslateModule } from '@ngx-translate/core';
 import { CommonModule } from '@angular/common';
 import { NgxPaginationModule } from 'ngx-pagination';
@@ -61,7 +60,6 @@ export class DatasetComponent implements OnInit {
     private toastrService: NbToastrService,
     private dialogService: NbDialogService,
     private configService: ConfigService<Record<string, any>>,
-    private refreshService: RefreshService,
     ) { 
       this.dataletBaseUrl = this.configService.config["datalet_base_url"];
       this.enableDatalet = this.configService.config["enable_datalet"];
@@ -70,8 +68,6 @@ export class DatasetComponent implements OnInit {
 
 
   ngOnInit(): void {
-    this.refreshService.refreshPageOnce('admin-configuration');
-
     let dataletOrigin = new URLParse(this.dataletBaseUrl);
     if(location.origin==dataletOrigin.origin){
       this.samedomain=true;

@@ -26,7 +26,7 @@
         <nb-card class="minicard">
             <nb-card-body class="d-flex flex-column align-items-left justify-content-left">
                 <h6 class="jumbotron-heading">{{ 'NAME' | translate }}</h6>
-                <input type="text" nbInput fullWidth status="primary" [(ngModel)]="node.name" placeholder="{{ 'NAME' | translate }}">
+                <input type="text" nbInput fullWidth status="primary" required [(ngModel)]="node.name" placeholder="{{ 'NAME' | translate }}">
             </nb-card-body>
 
             <nb-card-body class="d-flex flex-column align-items-left justify-content-left">
@@ -64,19 +64,32 @@
             
             <nb-card-body class="d-flex flex-column align-items-left justify-content-left">
                 <h6 class="jumbotron-heading">{{ 'HOMEPAGE' | translate }}</h6>
-                <input type="text" nbInput fullWidth status="primary" placeholder="{{ 'HOMEPAGE' | translate }}" [(ngModel)]="node.homepage">
+                <input type="text" nbInput fullWidth status="primary" placeholder="{{ 'HOMEPAGE' | translate }}" [(ngModel)]="node.homepage"
+                [disabled]="node.nodeType === 'DCATDUMP'"
+                [required]="node.nodeType !== 'DCATDUMP'">
             </nb-card-body>
             
             <nb-card-body class="d-flex flex-column align-items-left justify-content-left">
                 <h6 class="jumbotron-heading">{{ 'API_ENDPOINT' | translate }}</h6>
-                <input type="text" nbInput fullWidth status="primary" placeholder="{{ 'API_ENDPOINT' | translate }}" [(ngModel)]="node.host">
+                
+                <input type="url" nbInput fullWidth status="primary" placeholder="{{ 'API_ENDPOINT' | translate }}"     
+                [(ngModel)]="node.host"
+                [disabled]="true"
+                *ngIf="node.nodeType == 'ZENODO'"
+                readonly>                
+
+                <input type="url" nbInput fullWidth status="primary" placeholder="{{ 'API_ENDPOINT' | translate }}"
+                [(ngModel)]="node.host"
+                [disabled]="modifyId || node.nodeType === 'DCATDUMP'"
+                [required]="node.nodeType !== 'DCATDUMP'"
+                *ngIf="node.nodeType != 'ZENODO'">
             </nb-card-body>
             
             <div class="row show-grid">
                 <div class="col-md-4">
                     <nb-card-body class="d-flex flex-column align-items-left justify-content-left">
                         <h6 class="jumbotron-heading">{{ 'TYPE' | translate }}</h6>
-                        <nb-select fullWidth status="primary" (selectionChange)="changedTypeHandler($event)" [(ngModel)]="node.nodeType" placeholder="{{ 'TYPE' | translate }}">
+                        <nb-select fullWidth status="primary" (selectionChange)="changedTypeHandler($event)" [(ngModel)]="node.nodeType" required [disabled]="modifyId ? true : null" placeholder="{{ 'TYPE' | translate }}">
                             <nb-option *ngFor="let type of nodeType" [value]="type.value">
                                 {{ type.value }}
                             </nb-option>
@@ -87,7 +100,7 @@
                 <div class="col-md-4">
                     <nb-card-body class="d-flex flex-column align-items-left justify-content-left">
                         <h6 class="jumbotron-heading">{{ 'ACTIVE' | translate }}</h6>
-                        <nb-select fullWidth status="primary" (selectionChange)="changedActiveHandler($event)" [(ngModel)]="node.isActive"  placeholder="{{ 'ACTIVE' | translate }}">
+                        <nb-select fullWidth status="primary" (selectionChange)="changedActiveHandler($event)" [(ngModel)]="node.isActive" [disabled]="modifyId ? true : null" placeholder="{{ 'ACTIVE' | translate }}">
                             <nb-option *ngFor="let mode of activeMode" [value]="mode.value">
                                 {{ mode.text }}
                             </nb-option>
@@ -106,6 +119,14 @@
                         </nb-select>
                     </nb-card-body>
                 </div>
+
+                <div class="col-md-12" *ngIf="node.nodeType == 'ZENODO'">
+                    <nb-card-body class="d-flex flex-column align-items-left justify-content-left">
+                        <h6 class="jumbotron-heading">Communities:</h6>
+                        <input type="text" nbInput fullWidth status="primary" placeholder="communities" [(ngModel)]="node.communities"
+                        [required]="!modifyId ? true : null" [disabled]="modifyId ? true : null">
+                    </nb-card-body>
+                </div>
             
                 <div class="col-md-6" *ngIf="node.nodeType == 'DCATDUMP'">
                     <nb-card-body class="d-flex flex-column align-items-left justify-content-left">
@@ -116,7 +137,7 @@
                             <ng-template #emptyDumpString>
                                 <nb-icon nbTooltip="{{ 'DUMP_FILE_MISSING' | translate }}" icon="close-square-outline" class="ml-1"></nb-icon>
                             </ng-template>
-                            <nb-icon nbTooltip="{{ 'DUMP_FILE_MODIFY' | translate }}"  icon="edit-2-outline" [options]="{ animation: { type: 'zoom' } }" class="ml-1" (click)="handleOpenEditorDialog()"></nb-icon>
+                            <nb-icon nbTooltip="{{ 'DUMP_FILE_MODIFY' | translate }}"  icon="edit-2-outline" [options]="{ animation: { type: 'zoom' } }" class="ml-1" (click)="handleOpenEditorDialog(1)"></nb-icon>
                         </div>
                     </nb-card-body>
                 </div>
@@ -125,7 +146,7 @@
                     <nb-card-body class="d-flex flex-column align-items-left justify-content-left">
                         <h6 class="jumbotron-heading">{{ 'PROFILE' | translate }}</h6>
                         <nb-select fullWidth status="primary" (selectionChange)="updateDcatProfile($event)" [(ngModel)]="node.dcatProfile" placeholder="{{ 'PROFILE' | translate }}">
-                            <nb-option value="DCATAP">{{ 'DCATAP_IT' | translate }}</nb-option>
+                            <nb-option value="DCATAP">{{ 'DCATAP' | translate }}</nb-option>
                             <nb-option value="DCATAP_IT">{{ 'DCATAP_IT' | translate }}</nb-option>
                         </nb-select>
                     </nb-card-body>
@@ -161,8 +182,13 @@
                 <div class="col-md-6" *ngIf="node.nodeType == 'ORION'">
                     <nb-card-body class="d-flex flex-column align-items-left justify-content-left">
                         <h6 class="jumbotron-heading">{{ 'JSON_FILE' | translate }}</h6>
-                        <div class="custom-file">
+                        <div class="custom-file d-flex flex-row align-items-center justify-content-center">
                             <input nbInput type="file" class="form-control background-white" multiple id="importFileJsonOrion" (change)="onFileChange($event.target.files[0],2)">
+                            <nb-icon *ngIf="this.node.additionalConfig.orionDatasetDumpString != null; else emptyOrionDatasetDumpString" nbTooltip="{{ 'DUMP_FILE_CHECK' | translate }}" icon="checkmark-square-2-outline" class="ml-1"></nb-icon>
+                            <ng-template #emptyOrionDatasetDumpString>
+                                <nb-icon nbTooltip="{{ 'DUMP_FILE_MISSING' | translate }}" icon="close-square-outline" class="ml-1"></nb-icon>
+                            </ng-template>
+                            <nb-icon nbTooltip="{{ 'DUMP_FILE_MODIFY' | translate }}"  icon="edit-2-outline" [options]="{ animation: { type: 'zoom' } }" class="ml-1" (click)="handleOpenEditorDialog(2)"></nb-icon>
                         </div>
                     </nb-card-body>
                 </div>
@@ -180,17 +206,27 @@
                 <div class="col-md-6" *ngIf="node.nodeType == 'SPARQL'">
                     <nb-card-body class="d-flex flex-column align-items-left justify-content-left">
                         <h6 class="jumbotron-heading">{{ 'JSON_FILE' | translate }}</h6>
-                        <div class="custom-file">
+                        <div class="custom-file d-flex flex-row align-items-center justify-content-center">
                             <input nbInput type="file" class="form-control background-white" multiple id="importFileSparql" (change)="onFileChange($event.target.files[0],3)">
+                            <nb-icon *ngIf="this.node.additionalConfig.sparqlDatasetDumpString != ''; else emptySparqlDatasetDumpString" nbTooltip="{{ 'DUMP_FILE_CHECK' | translate }}" icon="checkmark-square-2-outline" class="ml-1"></nb-icon>
+                            <ng-template #emptySparqlDatasetDumpString>
+                                <nb-icon nbTooltip="{{ 'DUMP_FILE_MISSING' | translate }}" icon="close-square-outline" class="ml-1"></nb-icon>
+                            </ng-template>
+                            <nb-icon nbTooltip="{{ 'DUMP_FILE_MODIFY' | translate }}"  icon="edit-2-outline" [options]="{ animation: { type: 'zoom' } }" class="ml-1" (click)="handleOpenEditorDialog(3)"></nb-icon>
                         </div>
                     </nb-card-body>
                 </div>
             
                 <div class="col-md-6" *ngIf="node.nodeType == 'WEB'">
                     <nb-card-body class="d-flex flex-column align-items-left justify-content-left">
-                        <h6 class="jumbotron-heading">{{ 'JSON_FILE' | translate }}</h6>
-                        <div class="custom-file">
+                        <h6 class="jumbotron-heading">{{ 'JSON_FILE' | translate }}</h6>                        
+                        <div class="custom-file d-flex flex-row align-items-center justify-content-center">
                             <input nbInput type="file" class="form-control background-white" multiple id="importFileWeb" (change)="onFileChange($event.target.files[0],4)">
+                            <nb-icon *ngIf="this.node.sitemap != null; else emptySitemap" nbTooltip="{{ 'DUMP_FILE_CHECK' | translate }}" icon="checkmark-square-2-outline" class="ml-1"></nb-icon>
+                            <ng-template #emptySitemap>
+                                <nb-icon nbTooltip="{{ 'DUMP_FILE_MISSING' | translate }}" icon="close-square-outline" class="ml-1"></nb-icon>
+                            </ng-template>
+                            <nb-icon nbTooltip="{{ 'DUMP_FILE_MODIFY' | translate }}"  icon="edit-2-outline" [options]="{ animation: { type: 'zoom' } }" class="ml-1" (click)="handleOpenEditorDialog(4)"></nb-icon>
                         </div>
                     </nb-card-body>
                 </div>

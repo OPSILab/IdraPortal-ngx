@@ -1,6 +1,6 @@
 <div class="row show-grid">
   <div class="col-md-12">
-    <nb-accordion>
+    <nb-accordion [multi]="true">
       <nb-accordion-item>
         <nb-accordion-item-header>{{ 'Catalogues' | translate }}</nb-accordion-item-header>
         <nb-accordion-item-body>
@@ -105,8 +105,8 @@
               <nb-card>
                 <nb-card-body>
                   <div class="pb-20">
-                    <label class="search-label" for="search">{{ 'SEARCH' | translate }}:</label>
-                    <input fieldSize="small" nbInput [nbFilterInput]="dataSource" id="search" class="search-input">
+                    <label class="search-label" for="search-remote">{{ 'SEARCH' | translate }}:</label>
+                    <input fieldSize="small" nbInput [nbFilterInput]="dataSourceCat" id="search-remote" class="search-input">
                   </div>
                   <table [nbTreeGrid]="dataSourceCat" [nbSort]="dataSourceCat" (sort)="updateSort($event)">
                     <tr nbTreeGridHeaderRow *nbTreeGridHeaderRowDef="allColumnsCat"></tr>

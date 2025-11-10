@@ -1,9 +1,9 @@
 <div class="row mb-3">
     <div class="col-12">
         <!-- select Catalogues -->
-        <span>Catalogues</span>
+        <span>Catalogues </span>
         
-    <nb-select multiple [(selected)]="selectedCatalogues" placeholder="Multiple Select" class="w-150" (selectedChange)="getStatistics()">
+    <nb-select multiple [(selected)]="selectedCatalogues" placeholder="Multiple Select" class="w-150" (selectedChange)="onCataloguesChange($event)">
         <nb-option [value]="0">{{ 'ALL_SELECTED' | translate }}</nb-option>
         <nb-option *ngFor="let catalogue of catalogueList" [value]="catalogue.id">{{catalogue.name}}</nb-option>
     </nb-select>

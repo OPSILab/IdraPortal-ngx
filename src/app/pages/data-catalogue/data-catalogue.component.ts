@@ -1,5 +1,4 @@
 import { Component, OnInit } from '@angular/core';
-import { RefreshService } from '../services/refresh.service';
 import { RouterOutlet } from '@angular/router';
 
 @Component({
@@ -12,11 +11,9 @@ import { RouterOutlet } from '@angular/router';
 export class DataCatalogueComponent implements OnInit {
 
   constructor(
-    private refreshService: RefreshService,
   ) { }
 
   ngOnInit(): void {
-    this.refreshService.refreshPageOnce('admin-configuration');
   }
 
 }

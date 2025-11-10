@@ -1,17 +1,15 @@
 import { Component, Input, OnInit } from '@angular/core';
 import { DataCataglogueAPIService } from '../data-catalogue/services/data-cataglogue-api.service';
-import { CodeEditorModule, CodeModel } from '@ngstack/code-editor';
-import { RefreshService } from '../services/refresh.service';
+import { CodeEditorComponent, CodeModel } from '@ngstack/code-editor';
 import { NbButtonModule, NbCardModule, NbCheckboxModule, NbDatepickerModule, NbIconModule, NbInputModule, NbListModule, NbSelectModule, NbTabsetModule, NbTagModule, NbToastrService, NbTooltipModule } from '@nebular/theme';
 import { TranslateModule } from '@ngx-translate/core';
 import { CarouselModule } from 'ngx-owl-carousel-o';
 import { MatCardModule } from '@angular/material/card';
 import { CommonModule } from '@angular/common';
-import { NgdCodeBlockComponent } from './code-block/code-block.component';
 
 @Component({
+  standalone: true,
   imports: [
-    NgdCodeBlockComponent,
     CommonModule,
     TranslateModule,
     NbCardModule,
@@ -27,8 +25,8 @@ import { NgdCodeBlockComponent } from './code-block/code-block.component';
     NbSelectModule,
     NbInputModule,
     NbDatepickerModule,
-    NbCheckboxModule,
-    CodeEditorModule],
+  NbCheckboxModule,
+  CodeEditorComponent],
   selector: 'ngx-sparql',
   templateUrl: './sparql.component.html',
   styleUrls: ['./sparql.component.scss']
@@ -36,8 +34,7 @@ import { NgdCodeBlockComponent } from './code-block/code-block.component';
 export class SparqlComponent implements OnInit {
 
   constructor(
-      private refreshService: RefreshService,
-          private toastrService: NbToastrService,
+    private toastrService: NbToastrService,
     private restApi:DataCataglogueAPIService
   ) { }
 
@@ -124,7 +121,6 @@ LIMIT 50`,
   }
 
   ngOnInit(): void {
-    this.refreshService.refreshPageOnce('admin-configuration');
   }
 
 }

@@ -3,9 +3,10 @@ import { NbCardModule, NbDialogRef, NbSelectModule } from '@nebular/theme';
 import { Datalet } from '../model/datalet';
 import { DataCataglogueAPIService } from '../services/data-cataglogue-api.service';
 import { SafeHtmlPipe } from '../../../@theme/pipes';
+import { CommonModule } from '@angular/common';
 
 @Component({
-  imports: [NbCardModule, NbSelectModule, SafeHtmlPipe],
+  imports: [NbCardModule, NbSelectModule, SafeHtmlPipe, CommonModule],
   selector: 'ngx-show-datalets',
   templateUrl: './show-datalets.component.html',
   styleUrls: ['./show-datalets.component.scss']

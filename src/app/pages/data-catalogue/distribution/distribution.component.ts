@@ -3,9 +3,12 @@ import { NbCardModule, NbDialogRef } from '@nebular/theme';
 import { DCATDistribution } from '../model/dcatdistribution';
 import { DCTStandard } from '../model/dctstandard';
 import { SKOSConcept } from '../model/skosconcept';
+import { CommonModule } from '@angular/common';
+import { TranslateModule } from '@ngx-translate/core';
 
 @Component({
-  imports: [NbCardModule],
+  standalone: true,
+  imports: [NbCardModule, CommonModule, TranslateModule],
   selector: 'ngx-distribution',
   templateUrl: './distribution.component.html',
   styleUrls: ['./distribution.component.scss']

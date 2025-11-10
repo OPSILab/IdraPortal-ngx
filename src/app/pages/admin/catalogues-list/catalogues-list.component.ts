@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { NbDialogService, NbIconModule, NbInputModule, NbSortDirection, NbSortRequest, NbToggleModule, NbTooltipModule, NbTreeGridDataSource, NbTreeGridDataSourceBuilder, NbTreeGridModule } from '@nebular/theme';
-import { CataloguesServiceService } from '../catalogues-service.service';
+import { CataloguesServiceService } from '../../services/catalogues-service.service';
 import { ODMSCatalogue } from '../../data-catalogue/model/odmscatalogue';
 
 import { Output, EventEmitter} from '@angular/core';
@@ -9,7 +9,6 @@ import { ShowcaseDialogComponent } from './dialog/showcase-dialog/showcase-dialo
 import { Router, RouterModule } from '@angular/router';
 import { SharedService } from '../../services/shared.service';
 import { ODMSCatalogueComplete } from '../../data-catalogue/model/odmscataloguecomplete';
-import { RefreshService } from '../../services/refresh.service';
 import { TranslateService } from '@ngx-translate/core';
 import { ConfigService } from 'ngx-config-json';
 import { NbCardModule } from '@nebular/theme';
@@ -320,35 +319,41 @@ export class CataloguesListComponent implements OnInit {
 		private router: Router,
 		public translation: TranslateService,
 		private sharedService: SharedService,
-		private refreshService: RefreshService,
 		private config:ConfigService<Record<string, any>>
 	  ) {
-		this.CB_enabled=this.config.config["idra.orion.manager.url"];
+		// Ensure CB_enabled is a real boolean (config value may be a string URL)
+		this.CB_enabled = !!this.config.config["idra.orion.manager.url"];
+		// Initialize columns immediately to avoid header/cell template mismatches on first render
+		if (this.CB_enabled) {
+			this.defaultColumns = [ 'Name', 'Country', 'Type', 'Level', 'Status', 'Datasets', 'UpdatePeriod', 'LastUpdate', 'id', 'CB'];
+		} else {
+			this.defaultColumns = [ 'Name', 'Country', 'Type', 'Level', 'Status', 'Datasets', 'UpdatePeriod', 'LastUpdate', 'id'];
+		}
+		this.allColumns = [ this.customColumn, ...this.defaultColumns, this.iconColumn ];
 	}
 
 	ngOnInit(): void {
-		this.refreshService.refreshPageOnce('admin-configuration');
-
 		this.loadCatalogue();
 		setInterval(() => {
 			this.loadCatalogue();
 		}, 60000);
 	}
 
-	CB_enabled = true;
+	CB_enabled: boolean = true;
 	loadCatalogue(){
 		this.data = [];
 		// this.dataSource = this.dataSourceBuilder.create(this.data);
 		this.loading=true
 		if(this.CB_enabled){
 			this.defaultColumns = [ 'Name', 'Country', 'Type', 'Level', 'Status', 'Datasets', 'UpdatePeriod', 'LastUpdate', 'id', 'CB'];
-			this.allColumns = [ this.customColumn, ...this.defaultColumns, ...this.iconColumn ];
+			this.allColumns = [ this.customColumn, ...this.defaultColumns, this.iconColumn ];
 		} else {
 			this.defaultColumns = [ 'Name', 'Country', 'Type', 'Level', 'Status', 'Datasets', 'UpdatePeriod', 'LastUpdate', 'id'];
+			this.allColumns = [ this.customColumn, ...this.defaultColumns, this.iconColumn ];
 		}
 
 		this.restApi.getAllCataloguesInfo().subscribe(infos =>{
-			this.allColumns = [ this.customColumn, ...this.defaultColumns, ...this.iconColumn ];
+			this.allColumns = [ this.customColumn, ...this.defaultColumns, this.iconColumn ];
 			this.cataloguesInfos = infos;
 			console.log("cataloguesInfos: ",this.cataloguesInfos)
 			this.totalCatalogues = this.cataloguesInfos.length;
@@ -431,6 +436,7 @@ export class CataloguesListComponent implements OnInit {
 
 	getLevel(nodeType: string): string {
 			switch(nodeType){
+				case 'ZENODO':
 				case 'CKAN':
 					//federationLevel='LEVEL_3';
 					return "3";
