@@ -2,12 +2,15 @@
   <div class="col-row">
     <nb-card class="minicard">
       <nb-card-body class="d-flex flex-column align-items-center justify-content-center">
-        <h2 class="jumbotron-heading">{{ 'DATALET_SEARCH_TITLE' | translate }} {{totalDatasets}} {{ 'DATALET_DATASETS_FROM' | translate }} {{cataloguesInfos.length}} {{ 'DATALET_CATALOGUES' | translate }}!</h2>
+        <h2 class="jumbotron-heading">{{ 'DATALET_SEARCH_TITLE' | translate }} {{currentDatasets}} {{
+          'DATALET_DATASETS_FROM' | translate }} {{cataloguesInfos.length}} {{ 'DATALET_CATALOGUES' | translate }}!</h2>
         <nb-tag-list (tagRemove)="onTagRemove($event)">
-          <nb-tag appearance="outline" status="primary" *ngFor="let filter of filters" [text]="filter" removable></nb-tag>
+          <nb-tag appearance="outline" status="primary" *ngFor="let filter of filters" [text]="filter"
+            removable></nb-tag>
           <input id="tags_input" type="text" nbTagInput (tagAdd)="onTagAdd($event)" separatorKeys="[188,13]" fullWidth>
         </nb-tag-list>
-        <span class="dataset-found-span"><strong>{{ 'DATALET_DATASETS_FOUND' | translate }}:</strong> {{currentDatasets}}</span>
+        <span class="dataset-found-span"><strong>{{ 'DATALET_DATASETS_FOUND' | translate }}:</strong>
+          {{currentDatasets}}</span>
       </nb-card-body>
     </nb-card>
   </div>
@@ -24,8 +27,10 @@
         </nb-card-header>
         <nb-card-body>
           <div class="d-flex align-items-center mt-2 gap-3">
-            <nb-checkbox [checked]="isHVD_Dataset === true" (checkedChange)="toggleHasHVDCategory(true)">Yes</nb-checkbox>
-            <nb-checkbox [checked]="isHVD_Dataset === false" (checkedChange)="toggleHasHVDCategory(false)">No</nb-checkbox>
+            <nb-checkbox [checked]="isHVD_Dataset === true"
+              (checkedChange)="toggleHasHVDCategory(true)">Yes</nb-checkbox>
+            <nb-checkbox [checked]="isHVD_Dataset === false"
+              (checkedChange)="toggleHasHVDCategory(false)">No</nb-checkbox>
           </div>
         </nb-card-body>
       </nb-card>
@@ -34,14 +39,21 @@
         <nb-card-header class="d-flex justify-content-between">
           {{facet.displayName}}
           <span *ngIf="facet.values.length>10" class="d-flex flex-row-reverse">
-            <nb-icon *ngIf="getFacetsLimit(facet.displayName.toLowerCase())==10" icon="arrowhead-down-outline" (click)="setFacetsLimit(facet.displayName.toLowerCase(),facet.values.length)" nbTooltip="{{ 'DATALET_SHOW_ALL' | translate }}"></nb-icon>
-            <nb-icon *ngIf="getFacetsLimit(facet.displayName.toLowerCase())>10" icon="arrowhead-up-outline" (click)="setFacetsLimit(facet.displayName.toLowerCase(),10)" nbTooltip="{{ 'DATALET_SHOW_TOP_10' | translate }}"></nb-icon>
+            <nb-icon *ngIf="getFacetsLimit(facet.displayName.toLowerCase())==10" icon="arrowhead-down-outline"
+              (click)="setFacetsLimit(facet.displayName.toLowerCase(),facet.values.length)"
+              nbTooltip="{{ 'DATALET_SHOW_ALL' | translate }}"></nb-icon>
+            <nb-icon *ngIf="getFacetsLimit(facet.displayName.toLowerCase())>10" icon="arrowhead-up-outline"
+              (click)="setFacetsLimit(facet.displayName.toLowerCase(),10)"
+              nbTooltip="{{ 'DATALET_SHOW_TOP_10' | translate }}"></nb-icon>
           </span>
         </nb-card-header>
         <nb-card-body>
           <nb-list class="no-border">
-            <nb-list-item *ngFor="let item of filterFacets(facet.search_parameter,facet.values) | slice:0:getFacetsLimit(facet.displayName.toLowerCase())" class="p-1 no-border">
-              <a href="javascript:void(0)" (click)="getDatasetByFacet(facet.search_parameter,item.search_value)">{{item.facet}}</a>
+            <nb-list-item
+              *ngFor="let item of filterFacets(facet.search_parameter,facet.values) | slice:0:getFacetsLimit(facet.displayName.toLowerCase())"
+              class="p-1 no-border">
+              <a href="javascript:void(0)"
+                (click)="getDatasetByFacet(facet.search_parameter,item.search_value)">{{item.facet}}</a>
             </nb-list-item>
           </nb-list>
         </nb-card-body>
@@ -53,11 +65,14 @@
       </div>
       <div class="row m-1">
         <nb-tag-list (tagRemove)="onFilterRemove($event)">
-          <nb-tag appearance="outline" status="primary" *ngFor="let filter of filtersTags" [text]="filter" removable></nb-tag>
+          <nb-tag appearance="outline" status="primary" *ngFor="let filter of filtersTags" [text]="filter"
+            removable></nb-tag>
         </nb-tag-list>
       </div>
       <!-- results -->
-      <nb-card *ngFor="let dataset of searchResponse.results | paginate: { itemsPerPage: 10, currentPage: 1, totalItems: 100 }" class="minicard">
+      <nb-card
+        *ngFor="let dataset of searchResponse.results | paginate: { itemsPerPage: 10, currentPage: 1, totalItems: 100 }"
+        class="minicard">
         <nb-card-header>
           <a [routerLink]="[dataset.id]">{{dataset.title}}</a>
         </nb-card-header>
@@ -66,7 +81,8 @@
         </nb-card-body>
         <nb-card-footer>
           <nb-tag-list size="small">
-            <nb-tag *ngFor="let tmp of dataset.distributionFormats" text="{{tmp.format}} ({{tmp.count}})" size="tiny" [style.background]="getColor(tmp.format)"></nb-tag>
+            <nb-tag *ngFor="let tmp of dataset.distributionFormats" text="{{tmp.format}} ({{tmp.count}})" size="tiny"
+              [style.background]="getColor(tmp.format)"></nb-tag>
           </nb-tag-list>
         </nb-card-footer>
       </nb-card>
