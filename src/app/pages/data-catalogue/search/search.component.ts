@@ -73,58 +73,60 @@ export class SearchComponent implements OnInit {
     (this.searchResponse as any).results = (this.searchResponse as any).results || [];
     (this.searchResponse as any).count = (this.searchResponse as any).count || 0;
     this.loading=true
-    this.restApi.getCataloguesInfo().subscribe(infos =>{
-      this.cataloguesInfos = infos;
-      this.searchRequest.nodes = infos.map(x=>x.id)
-      this.loading=false
+    this.restApi.getCataloguesInfo().subscribe({
+      next: (infos) =>{
+        this.cataloguesInfos = infos;
+        this.searchRequest.nodes = infos.map(x=>x.id)
+        this.loading=false
 
-      let searchParam = this.router.routerState.snapshot.root.queryParams
+        let searchParam = this.router.routerState.snapshot.root.queryParams
 
-      console.log(searchParam)
-      if(searchParam['advancedSearch'] == 'true'){
-        this.searchRequest = JSON.parse(searchParam['params']);
-        // Update the local HVD state from the search request
-        if(this.searchRequest.hasHvdCategory) {
-          this.isHVD_Dataset = true;
-        }
-        // this.filtersTags = searchParam['params'].filters.map(x=>x.value);
-        this.searchDataset(true)
-      } else{
-        if(searchParam['type']!=undefined){
-          this.searchRequest.filters.push(new SearchFilter('catalogues',searchParam.search_value))
-          this.searchDataset(true)
-        }
-        else if(searchParam['name']!=undefined){
-          // this.filtersTags.push(searchParam.name)
-          this.searchRequest.filters.push(new SearchFilter('tags',searchParam.search_value))
-          this.searchDataset(true)
-        }
-        else if(searchParam['text']!=undefined){
-          // this.filtersTags.push(searchParam.value)
-          this.searchRequest.filters.push(new SearchFilter('datasetThemes',searchParam.search_value))
-          this.searchDataset(true)
-        }
-        else if(searchParam['tags']!=undefined){
-          let tags = searchParam.tags.split(',')
-          // tags.forEach(element => {
-          //   this.filtersTags.push(element)
-          // });
-          this.searchRequest.filters.push(new SearchFilter('tags',searchParam.tags))
-          this.searchDataset(true)
-        } 
-        else if(searchParam['all']!=undefined){
-          let tags = searchParam.all.split(',')
-          this.searchRequest.filters.push(new SearchFilter('ALL',searchParam.all))
+        console.log(searchParam)
+        if(searchParam['advancedSearch'] == 'true'){
+          this.searchRequest = JSON.parse(searchParam['params']);
+          // Update the local HVD state from the search request
+          if(this.searchRequest.hasHvdCategory) {
+            this.isHVD_Dataset = true;
+          }
+          // this.filtersTags = searchParam['params'].filters.map(x=>x.value);
           this.searchDataset(true)
         } else{
-          this.searchDataset(true)
+          if(searchParam['type']!=undefined){
+            this.searchRequest.filters.push(new SearchFilter('catalogues',searchParam.search_value))
+            this.searchDataset(true)
+          }
+          else if(searchParam['name']!=undefined){
+            // this.filtersTags.push(searchParam.name)
+            this.searchRequest.filters.push(new SearchFilter('tags',searchParam.search_value))
+            this.searchDataset(true)
+          }
+          else if(searchParam['text']!=undefined){
+            // this.filtersTags.push(searchParam.value)
+            this.searchRequest.filters.push(new SearchFilter('datasetThemes',searchParam.search_value))
+            this.searchDataset(true)
+          }
+          else if(searchParam['tags']!=undefined){
+            let tags = searchParam.tags.split(',')
+            // tags.forEach(element => {
+            //   this.filtersTags.push(element)
+            // });
+            this.searchRequest.filters.push(new SearchFilter('tags',searchParam.tags))
+            this.searchDataset(true)
+          } 
+          else if(searchParam['all']!=undefined){
+            let tags = searchParam.all.split(',')
+            this.searchRequest.filters.push(new SearchFilter('ALL',searchParam.all))
+            this.searchDataset(true)
+          } else{
+            this.searchDataset(true)
+          }
         }
-      }
 
-    },err=>{
-      console.log(err);
-      this.loading=false;
-    })
+      },error: err =>{ 
+        console.log(err);
+        this.loading=false;
+      }
+    });
   }
 
   updateFilters(tags){
@@ -173,8 +175,8 @@ export class SearchComponent implements OnInit {
       }
     })
 
-    this.restApi.searchDatasets(this.searchRequest).subscribe(
-      res=>{
+    this.restApi.searchDatasets(this.searchRequest).subscribe({
+      next: (res)=>{
         this.searchResponse=res
         this.currentDatasets = this.searchResponse.count;  
         if(isFirst){
@@ -183,10 +185,11 @@ export class SearchComponent implements OnInit {
         this.searchResponse.results.map((x:DCATDataset)=>{ this.processDataset(x) })
         this.loading=false;
       },
-      err=>{
+      error: (err)=>{
         console.log(err);
         this.loading=false;
-      });
+      }
+    });
 // create an observable of this.searchResponse
 
       return new Observable<SearchResult>(observer => {

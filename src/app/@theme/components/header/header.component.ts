@@ -37,6 +37,7 @@ import { SharedService } from '../../../pages/services/shared.service';
 export class HeaderComponent implements OnInit, OnDestroy {
 
   private destroy$: Subject<void> = new Subject<void>();
+  private readonly THEME_STORAGE_KEY = 'idraTheme';
   userPictureOnly: boolean = false;
   user: UserClaims;
   userMenuDefault: NbMenuItem[] = [];
@@ -106,6 +107,10 @@ export class HeaderComponent implements OnInit, OnDestroy {
   authenticated: boolean = false;
   
   ngOnInit() {
+    const savedTheme = this.window?.localStorage?.getItem(this.THEME_STORAGE_KEY);
+    if (savedTheme && this.themes.some(t => t.value === savedTheme)) {
+      this.currentTheme = savedTheme;
+    }
     this.changeTheme(this.currentTheme);
     this.idraUserLanguage = 'en';
 
@@ -154,7 +159,10 @@ export class HeaderComponent implements OnInit, OnDestroy {
         map(({ name }) => name),
         takeUntil(this.destroy$),
       )
-      .subscribe(themeName => this.currentTheme = themeName);
+      .subscribe(themeName => {
+        this.currentTheme = themeName;
+        try { this.window?.localStorage?.setItem(this.THEME_STORAGE_KEY, themeName); } catch (e) {}
+      });
       this.menuService.onItemClick()
       .pipe(
         filter(({ tag }) => tag === 'user-menu'),
@@ -190,6 +198,7 @@ export class HeaderComponent implements OnInit, OnDestroy {
         .subscribe(themeName => {
           this.currentTheme = themeName;
           this.rippleService.toggle(themeName?.startsWith('material'));
+          try { this.window?.localStorage?.setItem(this.THEME_STORAGE_KEY, themeName); } catch (e) {}
         });
   
       this.menuService.onItemClick()
@@ -213,7 +222,9 @@ export class HeaderComponent implements OnInit, OnDestroy {
   }
 
   changeTheme(themeName: string) {
+    this.currentTheme = themeName;
     this.themeService.changeTheme(themeName);
+    try { this.window?.localStorage?.setItem(this.THEME_STORAGE_KEY, themeName); } catch (e) {}
   }
 
   toggleSidebar(): boolean {

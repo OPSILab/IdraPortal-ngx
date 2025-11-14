@@ -17,4 +17,13 @@ if (environment.production) {
 
 bootstrapApplication(AppComponent, {
   providers: [importProvidersFrom(AppModule)]
-}).catch(err => console.error(err));
+})
+  .then(() => {
+    const spinner = document.getElementById('nb-global-spinner');
+    if (spinner) {
+      spinner.style.display = 'none';
+      // Optionally remove from DOM to prevent intercepting events
+      spinner.parentElement?.removeChild(spinner);
+    }
+  })
+  .catch(err => console.error(err));

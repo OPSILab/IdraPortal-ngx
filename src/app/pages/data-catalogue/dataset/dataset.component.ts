@@ -86,8 +86,8 @@ export class DatasetComponent implements OnInit {
 
   getDataset(){
     this.loading=true;
-    this.restApi.getDatasetById(this.id).subscribe(
-      res=>{ 
+    this.restApi.getDatasetById(this.id).subscribe({
+      next: (res)=>{ 
         this.dataset=res;
         let tmpLic=[]
         this.dataset.distributions.forEach( x => {
@@ -98,12 +98,12 @@ export class DatasetComponent implements OnInit {
         })
         this.loading=false;
      },
-      err=>{
+      error: (err)=>{
          this.loading=false;
          this.toastrService.danger(err.error.userMessage,"Error")
          this.router.navigate(['/pages/datasets']);
        }
-      )
+    });
   }
 
   openDistributionDetails(distribution:DCATDistribution){

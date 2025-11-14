@@ -8,14 +8,19 @@ import * as shp from "shpjs";
 import * as toGeoJson from 'togeojson';
 import JSZip from 'jszip';
 import proj4 from "proj4";
+import { TranslateModule } from '@ngx-translate/core';
 
 @Component({
-  imports: [NbCardModule, NbSpinnerModule],
+  imports: [NbCardModule, NbSpinnerModule, TranslateModule],
   selector: 'ngx-remoteCatalogue-dialog',
   templateUrl: 'geojson-dialog.component.html',
   styleUrls: ['geojson-dialog.component.scss'],
 })
 export class GeoJsonDialogComponent {
+
+  close() {
+    this.ref.close();
+  }
 
   @Input() title: string;
   distribution: DCATDistribution;

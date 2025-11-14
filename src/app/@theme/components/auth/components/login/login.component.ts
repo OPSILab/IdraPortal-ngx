@@ -11,10 +11,10 @@ import { getDeepFromObject } from '../../helpers';
 import { NbAuthService } from '../../services/auth.service';
 import { NbAuthResult } from '../../services/auth-result';
 import { FormsModule } from '@angular/forms';
-import { NbButtonModule, NbInputModule } from '@nebular/theme';
+import { NbAlertModule, NbButtonModule, NbCheckboxModule, NbInputModule } from '@nebular/theme';
 
 @Component({
-  imports: [FormsModule, NbInputModule, NbButtonModule, RouterModule],
+  imports: [FormsModule, NbInputModule, NbButtonModule, RouterModule, NbCheckboxModule, NbAlertModule],
   selector: 'nb-login',
   templateUrl: './login.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,

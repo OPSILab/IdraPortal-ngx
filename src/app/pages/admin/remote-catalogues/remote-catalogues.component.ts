@@ -34,78 +34,87 @@ interface FSEntry {
 })
 export class RemoteCataloguesComponent implements OnInit {
 	
-   cataloguesInfos: Array<ODMSCatalogueInfo>=[]
-   loading=false;
-   id=0;
+	cataloguesInfos: Array<ODMSCatalogueInfo>=[]
+	loading=false;
+	id=0;
 
-   totalCatalogues;
-   cataloguesMoreInfos: ODMSCatalogue
-   data: TreeNode<FSEntry>[] = [];
+	totalCatalogues;
+	cataloguesMoreInfos: ODMSCatalogue
+	data: TreeNode<FSEntry>[] = [];
 
-   activeMode = [{text:'',value:true},{text:'',value:false}];
-   allRemCat = []
-//    allRemCatJson = [];
-   allRemCatJson: any = remoteCatalogueData
+	activeMode = [{text:'',value:true},{text:'',value:false}];
+	allRemCat = []
+	//    allRemCatJson = [];
+	allRemCatJson: any = remoteCatalogueData
 
-  constructor(private dataSourceBuilder: NbTreeGridDataSourceBuilder<FSEntry>,
-	private restApi:CataloguesServiceService,
-	private router: Router,public translation: TranslateService,) { }
+	constructor(private dataSourceBuilder: NbTreeGridDataSourceBuilder<FSEntry>,
+		private restApi:CataloguesServiceService,
+		private router: Router,public translation: TranslateService,) { }
 
-  ngOnInit(): void {
-	// GET REM CATALOGUES LIST
-	this.restApi.getRemoteNodesJson().subscribe(infos =>{
-				console.log("\nCHIAMATA API GET ALL REM CAT. infos: "+infos[0].URL);
+	ngOnInit(): void {
+		// GET REM CATALOGUES LIST
+		this.restApi.getRemoteNodesJson().subscribe({
+			next: (infos) => {
+				console.log("\nCHIAMATA API GET ALL REM CAT. infos:", infos);
+				// normalize possible shapes (module with .default or plain array/object)
 				this.allRemCat = infos;
-	
-	},err=>{
-      console.log(err);
-    })
-	this.allRemCatJson = this.allRemCatJson.default
-	// console.log("\nREM CAT 1: "+this.allRemCatJson[0].name);
+			},
+			error: (err) => {
+				console.error('Failed to load remote catalogues from API, falling back to local JSON', err);
+			}
+		});
+		
+		this.allRemCatJson = this.allRemCatJson.default
+		// console.log("\nREM CAT 1: "+this.allRemCatJson[0].name);
 
-	let allCatalogues = [];
-	this.restApi.getAllCataloguesInfo().subscribe(infos =>{
-		allCatalogues = infos;
-		for (let k = 0; k < this.allRemCatJson.length; k++) {
+		let allCatalogues = [];
+		this.restApi.getAllCataloguesInfo().subscribe({
+			next: (infos) =>{
+				allCatalogues = infos;
+				for (let k = 0; k < this.allRemCatJson.length; k++) {
+						
+				// console.log("\nLOCATION: "+this.allRemCatJson[k].host);
+				//let nameHost = "<a href=\""+infos2.host+"\\\">"+infos2.name+"<a/>";
 				
-		// console.log("\nLOCATION: "+this.allRemCatJson[k].host);
-		//let nameHost = "<a href=\""+infos2.host+"\\\">"+infos2.name+"<a/>";
-		
-		let level = this.getLevel(this.allRemCatJson[k].nodeType);
-		
-		let  alreadyLoaded = false;
-		for (let i = 0; i < allCatalogues.length; i++) {
-			if(allCatalogues[i].host == this.allRemCatJson[k].host){
-				alreadyLoaded = true;
-				break;
+				let level = this.getLevel(this.allRemCatJson[k].nodeType);
+				
+				let  alreadyLoaded = false;
+				for (let i = 0; i < allCatalogues.length; i++) {
+					if(allCatalogues[i].host == this.allRemCatJson[k].host){
+						alreadyLoaded = true;
+						break;
+					}
+				}
+				
+				let data2 = [
+						{
+						data: { Name: this.allRemCatJson[k].name, Country: this.allRemCatJson[k].country, Type: this.allRemCatJson[k].nodeType, Level: level, Host: this.allRemCatJson[k].host, index: k, alreadyLoaded: alreadyLoaded}
+					}
+					];
+				
+				if(this.data.length==0){
+					
+					this.data = [
+						{
+						data: { Name: this.allRemCatJson[k].name, Country: this.allRemCatJson[k].country, Type: this.allRemCatJson[k].nodeType, Level: level, Host: this.allRemCatJson[k].host, index: k, alreadyLoaded: alreadyLoaded}
+					}
+					];
+				}
+				else{
+					this.data = this.data.concat(data2);
+					
+				}
+				
+				//costrutisco la tabella
+				this.dataSource = this.dataSourceBuilder.create(this.data);
+				
+				}
+			},
+			error: (err) =>{
+				console.log(err);
 			}
-		}
-		
-		let data2 = [
-				{
-				data: { Name: this.allRemCatJson[k].name, Country: this.allRemCatJson[k].country, Type: this.allRemCatJson[k].nodeType, Level: level, Host: this.allRemCatJson[k].host, index: k, alreadyLoaded: alreadyLoaded}
-			}
-			];
-		
-		if(this.data.length==0){
-			
-			this.data = [
-				{
-				data: { Name: this.allRemCatJson[k].name, Country: this.allRemCatJson[k].country, Type: this.allRemCatJson[k].nodeType, Level: level, Host: this.allRemCatJson[k].host, index: k, alreadyLoaded: alreadyLoaded}
-			}
-			];
-		}
-		else{
-			this.data = this.data.concat(data2);
-			
-		}
-		
-		//costrutisco la tabella
-		this.dataSource = this.dataSourceBuilder.create(this.data);
-		
-		}
-	})
-  }
+		});
+	}
 
 getLevel(nodeType: string): string {
 		switch(nodeType){
@@ -181,12 +190,15 @@ getLevel(nodeType: string): string {
 	delete object.image.imageId;
 	object.isActive = false;
 	fd.append("node",JSON.stringify(object));
-	this.restApi.addODMSNode(fd).subscribe(infos =>{
-		console.log("\nCHIAMATA API AGGIUNTA NODO. infos: "+infos);
-		this.router.navigate(['/pages/administration/adminCatalogues']);
-	},err=>{
-	console.log(err);
-	})
+	this.restApi.addODMSNode(fd).subscribe({
+		next: (infos) =>{
+			console.log("\nCHIAMATA API AGGIUNTA NODO. infos: "+infos);
+			this.router.navigate(['/pages/administration/adminCatalogues']);
+		},
+		error: (err) =>{
+			console.log(err);
+		}
+  	});
   }
 
   getShowOn(index: number) {

@@ -17,7 +17,7 @@
           <div class="col-sm-8 col-md-5 col-lg-4 offset-lg-2 offset-md-0 offset-sm-0 d-flex align-items-center gap-1">
             <label class="search-label">{{ 'REMOTE_CATALOGUE_ADMIN_REMOTE_CATALOGUE_LABEL' | translate }}</label>
             <nb-select placeholder="{{ 'REMOTE_CATALOGUE_ADMIN_JSON_CATALOGUE_PLACEHOLDER' | translate }}">
-              <nb-option *ngFor="let cat of allRemCat" [value]="cat.catalogueName">{{ cat.catalogueName }}</nb-option>
+              @for (cat of allRemCat; track cat.catalogueName) {<nb-option [value]="cat.catalogueName">{{ cat.catalogueName }}</nb-option>}
             </nb-select>
           </div>
           <div class="col-sm-2 col-md-1 col-lg-1 ">

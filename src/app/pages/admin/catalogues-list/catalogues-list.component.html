@@ -49,13 +49,9 @@
           <ng-container [nbTreeGridColumnDef]="defaultColumns[4]">
             <th nbTreeGridHeaderCell *nbTreeGridHeaderCellDef class="col-w-70">{{ 'CATALOGUE_LIST_STATUS' | translate }}</th>
             <td nbTreeGridCell *nbTreeGridCellDef="let row">
-              <ng-template #online>
-                <nb-icon icon="checkmark-outline" class="text-success"></nb-icon>
-              </ng-template>
-              <nb-icon *ngIf="row.data['synchLock'] == 'PERIODIC' || row.data[defaultColumns[4]] == 'LOADING'; else offline" class="rotate_icon" icon="loader-outline"></nb-icon>
-              <ng-template #offline>
-                <nb-icon *ngIf="row.data[defaultColumns[4]] === 'OFFLINE'; else online" icon="close-outline" class="text-danger"></nb-icon>
-              </ng-template>
+              @if (row.data['synchLock'] == 'PERIODIC' || row.data[defaultColumns[4]] == 'LOADING') {<nb-icon class="rotate_icon" icon="loader-outline"></nb-icon>} @else {
+                @if (row.data[defaultColumns[4]] === 'OFFLINE') {<nb-icon icon="close-outline" class="text-danger"></nb-icon>} @else {<nb-icon icon="checkmark-outline" class="text-success"></nb-icon>}
+              }
             </td>
           </ng-container>
   
@@ -79,15 +75,12 @@
             <td nbTreeGridCell *nbTreeGridCellDef="let row" class="hid">{{ row.data[defaultColumns[8]] }}</td>
           </ng-container>
   
-          <ng-container [nbTreeGridColumnDef]="defaultColumns[9]" *ngIf="CB_enabled">
+          @if (CB_enabled) {<ng-container [nbTreeGridColumnDef]="defaultColumns[9]">
             <th nbTreeGridHeaderCell [nbSortHeader]="getSortDirection(defaultColumns[9])" *nbTreeGridHeaderCellDef class="col-w-70">{{ 'CATALOGUE_LIST_CB' | translate }}</th>
             <td nbTreeGridCell *nbTreeGridCellDef="let row">
-              <ng-template #offline >
-                <nb-icon icon="close-outline" class="text-danger"></nb-icon>
-              </ng-template>
-              <nb-icon *ngIf="row.data[defaultColumns[9]] == true; else offline" icon="checkmark-outline" class="text-success"></nb-icon>
+              @if (row.data[defaultColumns[9]] == true) {<nb-icon icon="checkmark-outline" class="text-success"></nb-icon>} @else {<nb-icon icon="close-outline" class="text-danger"></nb-icon>}
             </td>
-          </ng-container>
+          </ng-container>}
   
           <!-- ICONS -->
           <ng-container [nbTreeGridColumnDef]="iconColumn">

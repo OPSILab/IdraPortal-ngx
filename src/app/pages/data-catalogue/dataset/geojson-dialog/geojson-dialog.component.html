@@ -1,5 +1,10 @@
 <nb-card >
-    <nb-card-header>{{ title }}</nb-card-header>
+    <nb-card-header>
+      <div style="display:flex; justify-content:space-between; align-items:center; width:100%;">
+        <div>{{ title }}</div>
+        <button nbButton status="primary" (click)="close()">{{ 'CLOSE' | translate }}</button>
+      </div>
+    </nb-card-header>
     <nb-card-body >
       <div class="card" [nbSpinner]="loading" nbSpinnerStatus="primary">
         <div class="geoJsonMap" #geoJsonMap id="geoJsonMap"></div>

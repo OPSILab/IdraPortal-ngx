@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import type { EChartsCoreOption as EChartsOption } from 'echarts/core';
 import { CoolTheme } from './cool-theme';
 import { StatisticsService } from '../services/statistics.service';
@@ -14,7 +14,7 @@ import { CommonModule } from '@angular/common';
   templateUrl: './statistics.component.html',
   styleUrls: ['./statistics.component.scss']
 })
-export class StatisticsComponent implements OnInit {
+export class StatisticsComponent implements OnInit, OnDestroy {
 
   constructor(
     private statisticsService : StatisticsService,
@@ -80,6 +80,8 @@ export class StatisticsComponent implements OnInit {
   selectedCatalogues: Array<number> = [0];
   dateInterval: any = [new Date(), new Date(new Date().getTime() - 8*24*60*60*1000)];
   selectedInterval: number = 0;
+  private latestRequestToken = 0;
+  private cataloguesChangeTimer: any;
 
   onCataloguesChange(selected: number[] | number): void {
     // Normalize selected values for multiple select
@@ -94,7 +96,12 @@ export class StatisticsComponent implements OnInit {
       }
       this.selectedCatalogues = Array.from(set);
     }
-    this.getStatistics();
+
+    // Debounce rapid selection changes
+    if (this.cataloguesChangeTimer) {
+      clearTimeout(this.cataloguesChangeTimer);
+    }
+    this.cataloguesChangeTimer = setTimeout(() => this.getStatistics(), 300);
   }
 
   getStatistics(): void {
@@ -113,8 +120,15 @@ export class StatisticsComponent implements OnInit {
     const slcCatalogues: number[] = this.selectedCatalogues.includes(0)
       ? this.catalogueList.map(c => c.id)
       : [...this.selectedCatalogues];
+
+    // Create a token to ensure only the latest request updates the view
+    const token = ++this.latestRequestToken;
     
     this.statisticsService.getStatistics(startDate, endDate, slcCatalogues ).then((data)=>{
+      // Ignore out-of-order responses
+      if (token !== this.latestRequestToken) {
+        return;
+      }
       let dataTop10 = { dataset: { source: [['Datasets', 'Datasets'] ] } };
       (data.cataloguesStatistics.datasetCountStatistics).forEach((element, index) => {
         dataTop10.dataset.source.push([element.name, element.datasetCount]);
@@ -152,6 +166,14 @@ export class StatisticsComponent implements OnInit {
       this.dataLicenses = dataLicenses;
 
     });
+  }
+
+  ngOnDestroy(): void {
+    if (this.cataloguesChangeTimer) {
+      clearTimeout(this.cataloguesChangeTimer);
+    }
+    // Invalidate any in-flight requests
+    this.latestRequestToken++;
   }
 
   ngOnInit(): void {

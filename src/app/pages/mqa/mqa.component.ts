@@ -38,11 +38,11 @@ interface FSEntryListCat {
   imports: [CommonModule, NbTreeGridModule, NbIconModule],
   selector: 'ngx-fs-icon',
   template: `
-    <nb-tree-grid-row-toggle [expanded]="expanded" *ngIf="this.Items != 0; else fileIcon">
-    </nb-tree-grid-row-toggle>
-    <ng-template #fileIcon>
+    @if (Items != 0) {
+      <nb-tree-grid-row-toggle [expanded]="expanded"></nb-tree-grid-row-toggle>
+    } @else {
       <nb-icon icon="file-text-outline"></nb-icon>
-    </ng-template>
+    }
   `,
 })
 export class FsIconComponent {
@@ -56,11 +56,11 @@ export class FsIconComponent {
   imports: [CommonModule, NbTreeGridModule, NbIconModule],
   selector: 'ngx-fs-icon-cat',
   template: `
-    <nb-tree-grid-row-toggle [expanded]="expanded" *ngIf="this.type != null || this.type != undefined; else fileIcon">
-    </nb-tree-grid-row-toggle>
-    <ng-template #fileIcon>
+    @if (type != null && type != undefined) {
+      <nb-tree-grid-row-toggle [expanded]="expanded"></nb-tree-grid-row-toggle>
+    } @else {
       <nb-icon icon="file-text-outline"></nb-icon>
-    </ng-template>
+    }
   `,
 })
 export class FsIconComponentCat {

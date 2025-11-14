@@ -7,6 +7,7 @@ import { Router } from '@angular/router';
 import { NbButton, NbButtonModule, NbCheckboxModule, NbDatepickerModule, NbIconModule, NbInputModule, NbListModule, NbSelectModule, NbTabsetModule, NbTagComponent, NbTagInputAddEvent, NbTagModule, NbTooltipModule } from '@nebular/theme';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { CommonModule } from '@angular/common';
+import { error } from 'console';
 
 @Component({
   standalone: true,
@@ -261,32 +262,36 @@ export class HomeComponent implements OnInit {
 
     
   ngOnInit(): void {
-    this.restApi.getCataloguesInfo().subscribe(infos =>{
-      this.cataloguesInfos = infos;
-      this.searchRequest.nodes = infos.map(x=>x.id)
-      this.selectedCatalogues = infos.map(x=>x.id);
-      this.selectedCatalogues.unshift(0);
-      this.selectedCatalogues_prev = this.selectedCatalogues;
-      this.restApi.searchDatasets(this.searchRequest).subscribe(
-        res=>{
-            this.totalDatasets = res.count;
-            let tags = res.facets.find(x=>x.displayName=="Tags").values;
-            tags = tags.map(x=>{return {name:x.keyword, search_value:x.search_value}})
-            // shuffle tags
-            for(let i=tags.length-1; i>0; i--){
-              const j = Math.floor(Math.random() * i)
-              const temp = tags[i]
-              tags[i] = tags[j]
-              tags[j] = temp
-            }
-            this.tags = tags.slice(0,30);
-            this.classes = this.tags.map(x=>this.randomClass());
-        },
-        err=>{
-          console.log(err);
+    this.restApi.getCataloguesInfo().subscribe({
+      next: (infos) =>{
+        this.cataloguesInfos = infos;
+        this.searchRequest.nodes = infos.map(x=>x.id)
+        this.selectedCatalogues = infos.map(x=>x.id);
+        this.selectedCatalogues.unshift(0);
+        this.selectedCatalogues_prev = this.selectedCatalogues;
+        this.restApi.searchDatasets(this.searchRequest).subscribe({
+          next: (res)=>{
+              this.totalDatasets = res.count;
+              let tags = res.facets.find(x=>x.displayName=="Tags").values;
+              tags = tags.map(x=>{return {name:x.keyword, search_value:x.search_value}})
+              // shuffle tags
+              for(let i=tags.length-1; i>0; i--){
+                const j = Math.floor(Math.random() * i)
+                const temp = tags[i]
+                tags[i] = tags[j]
+                tags[j] = temp
+              }
+              this.tags = tags.slice(0,30);
+              this.classes = this.tags.map(x=>this.randomClass());
+          },
+          error: (err)=>{
+            console.log(err);
+          }
         });
-    },err=>{
-      console.log(err);
+      },
+      error: (err)=>{
+        console.log(err);
+      }
     })
   }
 

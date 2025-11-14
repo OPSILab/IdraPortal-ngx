@@ -352,78 +352,115 @@ export class CataloguesListComponent implements OnInit {
 			this.allColumns = [ this.customColumn, ...this.defaultColumns, this.iconColumn ];
 		}
 
-		this.restApi.getAllCataloguesInfo().subscribe(infos =>{
-			this.allColumns = [ this.customColumn, ...this.defaultColumns, this.iconColumn ];
-			this.cataloguesInfos = infos;
-			console.log("cataloguesInfos: ",this.cataloguesInfos)
-			this.totalCatalogues = this.cataloguesInfos.length;
-			for(let i=0; i<infos.length; i++){
-				// make an if to check if name is readable to avoid errors
-				try {
+		this.restApi.getAllCataloguesInfo().subscribe({
+			next: (infos) => {
+				this.allColumns = [ this.customColumn, ...this.defaultColumns, this.iconColumn ];
+				this.cataloguesInfos = infos;
+				this.totalCatalogues = this.cataloguesInfos.length;
+				this.data = [];
 
-						// 	push to this.data the info of the catalogues
-						let level = this.getLevel(infos[i].nodeType);
-						let refreshPeriodValue = parseInt(infos[i].refreshPeriod);
-						let refreshPeriod = "";
-						switch(refreshPeriodValue){
+				for (let i = 0; i < infos.length; i++) {
+					const info = infos[i];
+					try {
+						const level = this.getLevel(info.nodeType);
+						const refreshPeriodValue = parseInt((info.refreshPeriod ?? '').toString(), 10);
+						let refreshPeriod = '';
+						switch (refreshPeriodValue) {
 							case 0:
-								refreshPeriod = "Auto-update";
+								refreshPeriod = 'Auto-update';
 								break;
 							case 1:
-								refreshPeriod = "-";
+								refreshPeriod = '-';
 								break;
-							case 3600: 
-								refreshPeriod = "1 hour";
+							case 3600:
+								refreshPeriod = '1 hour';
 								break;
 							case 86400:
-								refreshPeriod = "1 day";
+								refreshPeriod = '1 day';
 								break;
 							case 604800:
-								refreshPeriod = "1 week";
+								refreshPeriod = '1 week';
 								break;
+							default:
+								refreshPeriod = '-';
 						}
-						let country = this.countries.find(c => c.code == infos[i].country);
-	
+
+						const countryCode = info.country ?? 'IT';
+						const countryObj = this.countries.find(c => c.code === countryCode) ?? { name: countryCode };
+
 						this.data.push({
-							data: { Name: infos[i].name, Country: country.name, Type: infos[i].nodeType, Level: level, Status: infos[i].nodeState, CB: infos[i].isFederatedInCb, Datasets: infos[i].datasetCount, UpdatePeriod: refreshPeriod, LastUpdate: formatDate(infos[i].lastUpdateDate, 'yyyy-MM-dd HH:mm:ss', 'en-US'), id: infos[i].id, index: i, Active: infos[i].isActive, synchLock: infos[i].synchLock, catalogueUrl: infos[i].homepage},
+							data: {
+								Name: info.name,
+								Country: countryObj.name,
+								Type: info.nodeType,
+								Level: level,
+								Status: info.nodeState,
+								CB: info.isFederatedInCb,
+								Datasets: info.datasetCount,
+								UpdatePeriod: refreshPeriod,
+								LastUpdate: formatDate(info.lastUpdateDate, 'yyyy-MM-dd HH:mm:ss', 'en-US'),
+								id: info.id,
+								index: i,
+								Active: info.isActive,
+								synchLock: info.synchLock,
+								catalogueUrl: info.homepage
+							}
 						});
-						this.dataSource = this.dataSourceBuilder.create(this.data);
-				} catch (error) {
-					// skip
-						infos[i].country = "IT";
-						// 	push to this.data the info of the catalogues
-						let level = this.getLevel(infos[i].nodeType);
-						let refreshPeriodValue = parseInt(infos[i].refreshPeriod);
-						let refreshPeriod = "";
-						switch(refreshPeriodValue){
+					} catch (error) {
+						// fallback: ensure minimal sane values and continue
+						const fallback = infos[i];
+						const level = this.getLevel(fallback.nodeType);
+						const refreshPeriodValue = parseInt((fallback.refreshPeriod ?? '').toString(), 10);
+						let refreshPeriod = '-';
+						switch (refreshPeriodValue) {
 							case 0:
-								refreshPeriod = "Auto-update";
+								refreshPeriod = 'Auto-update';
 								break;
 							case 1:
-								refreshPeriod = "-";
+								refreshPeriod = '-';
 								break;
-							case 3600: 
-								refreshPeriod = "1 hour";
+							case 3600:
+								refreshPeriod = '1 hour';
 								break;
 							case 86400:
-								refreshPeriod = "1 day";
+								refreshPeriod = '1 day';
 								break;
 							case 604800:
-								refreshPeriod = "1 week";
+								refreshPeriod = '1 week';
 								break;
 						}
-						let country = this.countries.find(c => c.code == infos[i].country);
-	
+						const countryCode = fallback.country ?? 'IT';
+						const countryObj = this.countries.find(c => c.code === countryCode) ?? { name: countryCode };
+
 						this.data.push({
-							data: { Name: infos[i].name, Country: country.name, Type: infos[i].nodeType, Level: level, Status: infos[i].nodeState, CB: infos[i].isFederatedInCb, Datasets: infos[i].datasetCount, UpdatePeriod: refreshPeriod, LastUpdate: formatDate(infos[i].lastUpdateDate, 'yyyy-MM-dd HH:mm:ss', 'en-US'), id: infos[i].id, index: i, Active: infos[i].isActive, synchLock: infos[i].synchLock, catalogueUrl: infos[i].homepage},
+							data: {
+								Name: fallback.name ?? 'Unknown',
+								Country: countryObj.name,
+								Type: fallback.nodeType ?? 'UNKNOWN',
+								Level: level,
+								Status: fallback.nodeState ?? 'UNKNOWN',
+								CB: fallback.isFederatedInCb ?? false,
+								Datasets: fallback.datasetCount ?? 0,
+								UpdatePeriod: refreshPeriod,
+								LastUpdate: formatDate(fallback.lastUpdateDate ?? new Date(), 'yyyy-MM-dd HH:mm:ss', 'en-US'),
+								id: fallback.id ?? '',
+								index: i,
+								Active: fallback.isActive ?? false,
+								synchLock: fallback.synchLock ?? '',
+								catalogueUrl: fallback.homepage ?? ''
+							}
 						});
-						this.dataSource = this.dataSourceBuilder.create(this.data);
+					}
 				}
+
+				this.dataSource = this.dataSourceBuilder.create(this.data);
+				this.loading = false;
+			},
+			error: (err) => {
+				console.error(err);
+				this.loading = false;
 			}
-		},err=>{
-			console.log(err);
-			this.loading=false;
-		})
+		});
 	}
 
 

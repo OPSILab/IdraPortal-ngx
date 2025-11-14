@@ -8,7 +8,9 @@ import { SafeHtml } from '@angular/platform-browser';
   template: `
     <div class="container">
       <div class="lines">
-        <span *ngFor="let line of lines">{{ line }}</span>
+        @for (line of lines; track $index) {
+          <span>{{ line }}</span>
+        }
       </div>
       <pre contenteditable="true" spellcheck="false" (input)="updateCode()"><code class="hljs" [innerHTML]="code"></code></pre>
     </div>

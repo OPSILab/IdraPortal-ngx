@@ -1,19 +1,27 @@
 <h1 id="title" class="title">Login</h1>
 <p class="sub-title">Hello! Log in with your email.</p>
 
-<nb-alert *ngIf="showMessages.error && errors?.length && !submitted" outline="danger" role="alert">
-  <p class="alert-title"><b>There was a problem!</b></p>
-  <ul class="alert-message-list">
-    <li *ngFor="let error of errors" class="alert-message">{{ error }}</li>
-  </ul>
-</nb-alert>
+@if (showMessages.error && errors?.length && !submitted) {
+  <nb-alert outline="danger" role="alert">
+    <p class="alert-title"><b>There was a problem!</b></p>
+    <ul class="alert-message-list">
+      @for (error of errors; track $index) {
+        <li class="alert-message">{{ error }}</li>
+      }
+    </ul>
+  </nb-alert>
+}
 
-<nb-alert *ngIf="showMessages.success && messages?.length && !submitted" outline="success" role="alert">
-  <p class="alert-title"><b>Success!</b></p>
-  <ul class="alert-message-list">
-    <li *ngFor="let message of messages" class="alert-message">{{ message }}</li>
-  </ul>
-</nb-alert>
+@if (showMessages.success && messages?.length && !submitted) {
+  <nb-alert outline="success" role="alert">
+    <p class="alert-title"><b>Success!</b></p>
+    <ul class="alert-message-list">
+      @for (message of messages; track $index) {
+        <li class="alert-message">{{ message }}</li>
+      }
+    </ul>
+  </nb-alert>
+}
 
 <form (ngSubmit)="login()" #form="ngForm" aria-labelledby="title">
 
@@ -32,14 +40,18 @@
            [status]="username.dirty ? (username.invalid  ? 'danger' : 'success') : 'basic'"
            [required]="getConfigValue('forms.validation.username.required')"
            [attr.aria-invalid]="username.invalid && username.touched ? true : null">
-    <ng-container *ngIf="username.invalid && username.touched">
-      <p class="caption status-danger" *ngIf="username.errors?.required">
-        Username is required!
-      </p>
-      <p class="caption status-danger" *ngIf="username.errors?.pattern">
-        Username should be the real one!
-      </p>
-    </ng-container>
+    @if (username.invalid && username.touched) {
+      @if (username.errors?.required) {
+        <p class="caption status-danger">
+          Username is required!
+        </p>
+      }
+      @if (username.errors?.pattern) {
+        <p class="caption status-danger">
+          Username should be the real one!
+        </p>
+      }
+    }
   </div>
 
   <div class="form-control-group">
@@ -61,21 +73,27 @@
            [minlength]="getConfigValue('forms.validation.password.minLength')"
            [maxlength]="getConfigValue('forms.validation.password.maxLength')"
            [attr.aria-invalid]="password.invalid && password.touched ? true : null">
-    <ng-container *ngIf="password.invalid && password.touched ">
-      <p class="caption status-danger" *ngIf="password.errors?.required">
-        Password is required!
-      </p>
-      <p class="caption status-danger" *ngIf="password.errors?.minlength || password.errors?.maxlength">
-        Password should contain
-        from {{ getConfigValue('forms.validation.password.minLength') }}
-        to {{ getConfigValue('forms.validation.password.maxLength') }}
-        characters
-      </p>
-    </ng-container>
+    @if (password.invalid && password.touched) {
+      @if (password.errors?.required) {
+        <p class="caption status-danger">
+          Password is required!
+        </p>
+      }
+      @if (password.errors?.minlength || password.errors?.maxlength) {
+        <p class="caption status-danger">
+          Password should contain
+          from {{ getConfigValue('forms.validation.password.minLength') }}
+          to {{ getConfigValue('forms.validation.password.maxLength') }}
+          characters
+        </p>
+      }
+    }
   </div>
 
   <div class="form-control-group accept-group">
-    <nb-checkbox name="rememberMe" [(ngModel)]="user.rememberMe" *ngIf="rememberMe">Remember me</nb-checkbox>
+    @if (rememberMe) {
+      <nb-checkbox name="rememberMe" [(ngModel)]="user.rememberMe">Remember me</nb-checkbox>
+    }
   </div>
 
   <button nbButton
@@ -88,29 +106,41 @@
   </button>
 </form>
 
-<section *ngIf="socialLinks && socialLinks.length > 0" class="links" aria-label="Social sign in">
-  or enter with:
-  <div class="socials">
-    <ng-container *ngFor="let socialLink of socialLinks">
-      <a *ngIf="socialLink.link"
-         [routerLink]="socialLink.link"
-         [attr.target]="socialLink.target"
-         [attr.class]="socialLink.icon"
-         [class.with-icon]="socialLink.icon">
-        <nb-icon *ngIf="socialLink.icon; else title" [icon]="socialLink.icon"></nb-icon>
-        <ng-template #title>{{ socialLink.title }}</ng-template>
-      </a>
-      <a *ngIf="socialLink.url"
-         [attr.href]="socialLink.url"
-         [attr.target]="socialLink.target"
-         [attr.class]="socialLink.icon"
-         [class.with-icon]="socialLink.icon">
-        <nb-icon *ngIf="socialLink.icon; else title" [icon]="socialLink.icon"></nb-icon>
-        <ng-template #title>{{ socialLink.title }}</ng-template>
-      </a>
-    </ng-container>
-  </div>
-</section>
+@if (socialLinks && socialLinks.length > 0) {
+  <section class="links" aria-label="Social sign in">
+    or enter with:
+    <div class="socials">
+      @for (socialLink of socialLinks; track socialLink.title) {
+        @if (socialLink.link) {
+          <a
+            [routerLink]="socialLink.link"
+            [attr.target]="socialLink.target"
+            [attr.class]="socialLink.icon"
+            [class.with-icon]="socialLink.icon">
+            @if (socialLink.icon) {
+              <nb-icon [icon]="socialLink.icon"></nb-icon>
+            } @else {
+              {{ socialLink.title }}
+            }
+          </a>
+        }
+        @if (socialLink.url) {
+          <a
+            [attr.href]="socialLink.url"
+            [attr.target]="socialLink.target"
+            [attr.class]="socialLink.icon"
+            [class.with-icon]="socialLink.icon">
+            @if (socialLink.icon) {
+              <nb-icon [icon]="socialLink.icon"></nb-icon>
+            } @else {
+              {{ socialLink.title }}
+            }
+          </a>
+        }
+      }
+    </div>
+  </section>
+}
 
 <!-- <section class="another-action" aria-label="Register">
   Don't have an account? <a class="text-link" routerLink="../register">Register</a>

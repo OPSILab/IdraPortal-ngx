@@ -1,12 +1,13 @@
 import { Component, OnInit } from '@angular/core';
-import { NbCardModule, NbDialogRef, NbSelectModule } from '@nebular/theme';
+import { NbButtonModule, NbCardModule, NbDialogRef, NbSelectModule } from '@nebular/theme';
 import { Datalet } from '../model/datalet';
 import { DataCataglogueAPIService } from '../services/data-cataglogue-api.service';
 import { SafeHtmlPipe } from '../../../@theme/pipes';
 import { CommonModule } from '@angular/common';
+import { TranslateModule } from '@ngx-translate/core';
 
 @Component({
-  imports: [NbCardModule, NbSelectModule, SafeHtmlPipe, CommonModule],
+  imports: [NbCardModule, NbSelectModule, SafeHtmlPipe, CommonModule, TranslateModule, NbButtonModule],
   selector: 'ngx-show-datalets',
   templateUrl: './show-datalets.component.html',
   styleUrls: ['./show-datalets.component.scss']
