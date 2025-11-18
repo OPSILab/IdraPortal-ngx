@@ -60,7 +60,7 @@ export class SearchComponent implements OnInit {
 
   filters: Array<string> = [];
   filtersTags: Array<string>= [];
-  isHVD_Dataset = false;
+  isHVD_Dataset: boolean | null = null; // null = show all
 
   ngOnDestroy() {
   }
@@ -134,14 +134,16 @@ export class SearchComponent implements OnInit {
       this.searchDataset()
   }
 
-  toggleHasHVDCategory(checked: boolean) {
-    if (checked) {
-      this.isHVD_Dataset = true;
-      this.searchRequest.hasHvdCategory = true;
+
+
+  toggleHasHVDCategory(value: boolean) {
+    if (this.isHVD_Dataset === value) {
+      this.isHVD_Dataset = null;
     } else {
-      this.isHVD_Dataset = false;
       this.searchRequest.hasHvdCategory = undefined;
+      this.isHVD_Dataset = value;
     }
+    this.searchRequest.hasHvdCategory = this.isHVD_Dataset;
     this.searchDataset();
   }
 

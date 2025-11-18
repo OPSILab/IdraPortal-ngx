@@ -189,8 +189,8 @@ export class DatasetComponent implements OnInit {
 
     this.loading = true;
     if (this.samedomain) {
-      this.restApi.downloadFromUri(distribution).subscribe(
-        res => {
+      this.restApi.downloadFromUri(distribution).subscribe({
+        next: (res) => {
           this.loading = false;
 
           this.dialogService.open(DataletIframeComponent, {
@@ -209,22 +209,22 @@ export class DatasetComponent implements OnInit {
             );
 
         },
-        err => {
+        error: err => {
           this.loading = false;
           this.toastrService.danger("File with url " + distribution.downloadURL + " returned " + err.status + "!", "Unable to create Datalet");
         }
-      )
+      });
     } else {
-      this.restApi.downloadFromUri(distribution).subscribe(
-        res => {
+      this.restApi.downloadFromUri(distribution).subscribe({
+        next: (res) => {
           this.loading = false;
           window.open(`${this.dataletBaseUrl}?ln=en&format=${parameter}&nodeID=${this.dataset.nodeID}&distributionID=${distribution.id}&datasetID=${this.dataset.id}&url=${encodeURIComponent(distribution.downloadURL)}`)
         },
-        err => {
+        error: err => {
           this.loading = false;
           this.toastrService.danger("File with url " + distribution.downloadURL + " returned " + err.status + "!", "Unable to create Datalet");
         }
-      )
+      });
     }
   }
 
@@ -257,8 +257,8 @@ export class DatasetComponent implements OnInit {
     else{
       if(this.checkDistributionFormat(distribution.format)){
         if(formatLower == "rdf"){
-          this.restApi.downloadRDFfromUrl(distribution).subscribe(
-            (res : string) => {
+          this.restApi.downloadRDFfromUrl(distribution).subscribe({
+            next: (res : string) => {
               console.log(res);
               this.dialogService.open(PreviewDialogComponent, {
                 context: {
@@ -267,10 +267,10 @@ export class DatasetComponent implements OnInit {
                 },
               })
             },
-            err => {
+            error: err => {
               this.toastrService.danger("Could not load the file", "Error");
             }
-          )
+          })
         } else {
           this.dialogService.open(PreviewDialogComponent, {
             context: {
