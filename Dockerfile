@@ -1,4 +1,4 @@
-FROM node:20.14.0-alpine as builder
+FROM node:24.11.0-alpine as builder
 ARG BASE_HREF
 RUN mkdir -p /app
 WORKDIR /app
