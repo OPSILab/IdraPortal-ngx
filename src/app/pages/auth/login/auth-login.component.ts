@@ -27,14 +27,24 @@ export class AuthLoginComponent implements OnDestroy {
   }
 
   login() {
-    
-    this.authService.authenticate(this.config.config["authProfile"])
-    .pipe(takeUntil(this.destroy$))
+    this.authService
+      .authenticate(this.config.config["authProfile"]) 
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        // No-op: subscribing triggers the redirect side-effect
+        next: () => {},
+        error: () => {},
+      });
   }
 
   logout() {
-    this.authService.logout(this.config.config["authProfile"])
+    this.authService
+      .logout(this.config.config["authProfile"]) 
       .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: () => {},
+        error: () => {},
+      });
   }
 
   ngOnDestroy(): void {

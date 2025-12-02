@@ -1,8 +1,8 @@
 {   
     "enableAuthentication":true,
     "authenticationMethod":"basic",
-    "idmBaseURL":"http://localhost:8081",
-    "keyCloakBaseURL": "https://platform.beopendep.it",
+    "idmBaseURL":"https://dx-lab.it",
+    "keyCloakBaseURL": "https://dx-lab.it",
     "dashboardBaseURL":"http://localhost:4200",
     "keyCloakRealmName":"master",
     "idmRealmName":"urbanite",
