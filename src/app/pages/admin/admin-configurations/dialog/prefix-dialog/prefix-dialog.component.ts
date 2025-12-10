@@ -1,7 +1,11 @@
+import { CommonModule } from '@angular/common';
 import { Component, Input } from '@angular/core';
-import { NbDialogRef } from '@nebular/theme';
+import { FormsModule } from '@angular/forms';
+import { NbButtonModule, NbCardModule, NbDialogRef, NbInputModule } from '@nebular/theme';
+import { TranslateModule } from '@ngx-translate/core';
 
 @Component({
+  imports: [NbCardModule, TranslateModule, FormsModule, CommonModule, NbButtonModule, NbInputModule],
   selector: 'ngx-prefix-dialog',
   templateUrl: 'prefix-dialog.component.html',
   styleUrls: ['prefix-dialog.component.scss'],

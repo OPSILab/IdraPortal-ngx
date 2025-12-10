@@ -1,82 +1,88 @@
-<div class="row mb-3">
-    <div class="col-12">
-        <!-- select Catalogues -->
-        <span>Catalogues</span>
-        
-    <nb-select multiple [(selected)]="selectedCatalogues" placeholder="Multiple Select" class="w-150" (selectedChange)="getStatistics()">
-        <nb-option [value]="0">{{ 'ALL_SELECTED' | translate }}</nb-option>
-        <nb-option *ngFor="let catalogue of catalogueList" [value]="catalogue.id">{{catalogue.name}}</nb-option>
-    </nb-select>
-    </div>
-</div>
-<div class="row mb-3">
-    <div class="col-lg-6 col-12">
-        <div class="card">
-            <div class="card-header">
-                <h5 class="card-title">{{ 'TOP_10_CATALOGUES' | translate }}</h5>
+<section class="jumbotron">
+  <div class="container">
+        <div class="row mb-3">
+            <div class="col-12">
+                <!-- select Catalogues -->
+                <span>Catalogues </span>
+                
+            <nb-select multiple [(selected)]="selectedCatalogues" placeholder="Multiple Select" class="w-150" (selectedChange)="onCataloguesChange($event)">
+                <nb-option [value]="0">{{ 'ALL_SELECTED' | translate }}</nb-option>
+                @for (catalogue of catalogueList; track catalogue.id) {
+                    <nb-option [value]="catalogue.id">{{ catalogue.name }}</nb-option>
+                }
+            </nb-select>
             </div>
-            <div class="card-body">
-                <div echarts [options]="options" [merge]="dataTop10" class="demo-chart"></div>
+        </div>
+        <div class="row mb-3">
+            <div class="col-lg-6 col-12">
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="card-title">{{ 'TOP_10_CATALOGUES' | translate }}</h5>
+                    </div>
+                    <div class="card-body">
+                        <div echarts [options]="options" [merge]="dataTop10" class="demo-chart"></div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-6 col-12">
+                <div class="card">
+                    <div class="card-header d-flex flex-row justify-content-between">
+                        <h5 class="card-title">{{ 'MOST_ACTIVE_CATALOGUES' | translate }}</h5>
+                        <nb-select placeholder="Select Showcase" [(selected)]="selectedInterval" (selectedChange)="getStatistics()">
+                        <nb-option [value]="0">{{ 'LAST_WEEK' | translate }}</nb-option>
+                        <nb-option [value]="1">{{ 'LAST_MONTH' | translate }}</nb-option>
+                        <nb-option [value]="2">{{ 'LAST_YEAR' | translate }}</nb-option>
+                        </nb-select>
+                    </div>
+                    <div class="card-body">
+                        <div echarts [options]="optionsMostActive" [merge]="dataMostActive" class="demo-chart" [autoResize]="true"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row mb-3">
+            <div class="col-lg-6 col-12">
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="card-title">{{ 'FEDERATED_CATALOGUES_TECHNOLOGIES' | translate }}</h5>
+                    </div>
+                    <div class="card-body">
+                        <div echarts [options]="optionsCircle" [merge]="dataTechnologies" [theme]="coolTheme" class="demo-chart"></div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-6 col-12">
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="card-title">{{ 'DCAT_THEMES_DATASETS' | translate }}</h5>
+                    </div>
+                    <div class="card-body">
+                        <div echarts [options]="optionsCircle" [merge]="dataThemes" [theme]="coolTheme" class="demo-chart"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row mb-3">
+            <div class="col-lg-6 col-12">
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="card-title">{{ 'MOST_USED_DISTRIBUTION_FORMATS' | translate }}</h5>
+                    </div>
+                    <div class="card-body">
+                        <div echarts [options]="optionsCircle" [merge]="dataFormats" [theme]="coolTheme" class="demo-chart"></div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-6 col-12">
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="card-title">{{ 'MOST_USED_DISTRIBUTION_LICENSES' | translate }}</h5>
+                    </div>
+                    <div class="card-body">
+                        <div echarts [options]="optionsCircle" [merge]="dataLicenses" [theme]="coolTheme" class="demo-chart"></div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
-    <div class="col-lg-6 col-12">
-        <div class="card">
-            <div class="card-header d-flex flex-row justify-content-between">
-                <h5 class="card-title">{{ 'MOST_ACTIVE_CATALOGUES' | translate }}</h5>
-                <nb-select placeholder="Select Showcase" [(selected)]="selectedInterval" (selectedChange)="getStatistics()">
-                  <nb-option [value]="0">{{ 'LAST_WEEK' | translate }}</nb-option>
-                  <nb-option [value]="1">{{ 'LAST_MONTH' | translate }}</nb-option>
-                  <nb-option [value]="2">{{ 'LAST_YEAR' | translate }}</nb-option>
-                </nb-select>
-            </div>
-            <div class="card-body">
-                <div echarts [options]="optionsMostActive" [merge]="dataMostActive" class="demo-chart" [autoResize]="true"></div>
-            </div>
-        </div>
-    </div>
-</div>
-<div class="row mb-3">
-    <div class="col-lg-6 col-12">
-        <div class="card">
-            <div class="card-header">
-                <h5 class="card-title">{{ 'FEDERATED_CATALOGUES_TECHNOLOGIES' | translate }}</h5>
-            </div>
-            <div class="card-body">
-                <div echarts [options]="optionsCircle" [merge]="dataTechnologies" [theme]="coolTheme" class="demo-chart"></div>
-            </div>
-        </div>
-    </div>
-    <div class="col-lg-6 col-12">
-        <div class="card">
-            <div class="card-header">
-                <h5 class="card-title">{{ 'DCAT_THEMES_DATASETS' | translate }}</h5>
-            </div>
-            <div class="card-body">
-                <div echarts [options]="optionsCircle" [merge]="dataThemes" [theme]="coolTheme" class="demo-chart"></div>
-            </div>
-        </div>
-    </div>
-</div>
-<div class="row mb-3">
-    <div class="col-lg-6 col-12">
-        <div class="card">
-            <div class="card-header">
-                <h5 class="card-title">{{ 'MOST_USED_DISTRIBUTION_FORMATS' | translate }}</h5>
-            </div>
-            <div class="card-body">
-                <div echarts [options]="optionsCircle" [merge]="dataFormats" [theme]="coolTheme" class="demo-chart"></div>
-            </div>
-        </div>
-    </div>
-    <div class="col-lg-6 col-12">
-        <div class="card">
-            <div class="card-header">
-                <h5 class="card-title">{{ 'MOST_USED_DISTRIBUTION_LICENSES' | translate }}</h5>
-            </div>
-            <div class="card-body">
-                <div echarts [options]="optionsCircle" [merge]="dataLicenses" [theme]="coolTheme" class="demo-chart"></div>
-            </div>
-        </div>
-    </div>
-</div>
+</section>

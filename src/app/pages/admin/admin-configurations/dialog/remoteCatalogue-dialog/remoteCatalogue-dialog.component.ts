@@ -1,7 +1,11 @@
+import { CommonModule } from '@angular/common';
 import { Component, Input } from '@angular/core';
-import { NbDialogRef } from '@nebular/theme';
+import { FormsModule } from '@angular/forms';
+import { NbButtonModule, NbCardModule, NbDialogRef, NbInputModule, NbSelectModule } from '@nebular/theme';
+import { TranslateModule } from '@ngx-translate/core';
 
 @Component({
+  imports: [NbCardModule, TranslateModule, FormsModule, NbSelectModule, CommonModule, NbInputModule, NbButtonModule],
   selector: 'ngx-remoteCatalogue-dialog',
   templateUrl: 'remoteCatalogue-dialog.component.html',
   styleUrls: ['remoteCatalogue-dialog.component.scss'],

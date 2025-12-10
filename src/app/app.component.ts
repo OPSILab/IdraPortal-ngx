@@ -3,25 +3,32 @@
  * Copyright Akveo. All Rights Reserved.
  * Licensed under the MIT License. See License.txt in the project root for license information.
  */
-import { Component, OnInit } from '@angular/core';
+import { Component } from '@angular/core';
 import { ConfigService } from 'ngx-config-json';
-import { HttpClient } from '@angular/common/http';
 import { environment } from '../environments/environment';
-import { NbAuthOAuth2JWTToken, NbOAuth2AuthStrategy, NbOAuth2ClientAuthMethod, NbOAuth2GrantType, NbOAuth2ResponseType } from '@nebular/auth';
+import { NbOAuth2AuthStrategy, NbOAuth2ClientAuthMethod, NbOAuth2GrantType, NbOAuth2ResponseType } from '@nebular/auth';
 import { OidcJWTToken } from './pages/auth/oidc/oidc';
 import { NbPasswordAuthStrategy } from './@theme/components/auth/public_api';
+import { RouterOutlet } from '@angular/router';
+import { TranslateService } from '@ngx-translate/core';
 @Component({
+  standalone: true,
+  imports: [RouterOutlet],
   selector: 'ngx-app',
   template: '<router-outlet></router-outlet>',
 })
 export class AppComponent {
 
   constructor(
-     oauthStrategy: NbOAuth2AuthStrategy,
-     oauthStrategyPwd:NbPasswordAuthStrategy,
-    private http : HttpClient,
+    oauthStrategy: NbOAuth2AuthStrategy,
+    oauthStrategyPwd:NbPasswordAuthStrategy,
     private config:ConfigService<Record<string, any>>,
+    private translate: TranslateService,
     ) {
+    this.translate.addLangs(['en']);
+    this.translate.setFallbackLang('en');
+    this.translate.use('en');
+
      if(this.config.config["authenticationMethod"].toLowerCase() === "keycloak"){
      
       oauthStrategy.setOptions({
@@ -67,7 +74,6 @@ export class AppComponent {
         defaultMessages: ['You have been successfully logged in.'],
       },
       logout: {
-        // ...
         alwaysFail: false,
         endpoint: '/logout',
         method: 'post',

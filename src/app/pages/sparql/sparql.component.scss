@@ -1,8 +1,10 @@
 @use '../../@theme/styles/themes' as *;
 
+// Use theme code block background outside mixin for reuse
+$code-block-bg: nb-theme(code-block-bg);
+
 @include nb-install-component() {
   $code-lines-fg: #515877;
-  $code-block-bg: nb-theme(code-block-bg);
 
   .container {
     display: flex;
@@ -138,17 +140,33 @@ ul.cloud li:nth-child(9n+1) div { color: rgb(126, 78, 15); }
 }
 
 /* Card per l'editor */
+// Card hosting the editor
 .editor-card {
   height: 70vh;
+  padding: 0; // remove default padding if any
+  border-radius: 0.5rem;
 }
 
+// Card body: remove padding
 .editor-card-body {
   height: 70vh;
+  padding: 0 !important; // ensure Nebular default padding is overridden
 }
 
 /* Editor di codice */
 .code-editor {
-  height: 65vh;
+  height: 70vh;
+  width: 100%;
+  border-radius: 0.5rem; // increase radius for smoother look
+  // background-color: $code-block-bg; // use theme color
+  overflow: hidden; // ensure inner editor respects rounded corners
+}
+
+// Ensure Monaco/Ngs editor inner background matches theme & radius
+::ng-deep .code-editor .monaco-editor, 
+::ng-deep .code-editor .monaco-editor .monaco-editor-background {
+  // background: $code-block-bg !important;
+  border-radius: 0.5rem;
 }
 
 /* Etichetta formato output */
@@ -164,9 +182,9 @@ ul.cloud li:nth-child(9n+1) div { color: rgb(126, 78, 15); }
 
 /* Stile per il jumbotron e il contenitore principale */
 .jumbotron {
-  padding: 2rem 1rem;
-  margin-bottom: 2rem;
-  background-color: #e9ecef;
+  // padding: 2rem 1rem;
+  // margin-bottom: 2rem;
+  // background-color: #e9ecef;
   border-radius: 0.3rem;
 }
 

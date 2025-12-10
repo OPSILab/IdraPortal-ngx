@@ -1,9 +1,11 @@
 import { Component, OnInit } from '@angular/core';
-import { NbDialogService, NbSortDirection, NbSortRequest, NbTreeGridDataSource, NbTreeGridDataSourceBuilder } from '@nebular/theme';
-import { CataloguesServiceService } from '../catalogues-service.service';
+import { NbButtonModule, NbDialogModule, NbDialogService, NbIconModule, NbSortDirection, NbSortRequest, NbTreeGridDataSource, NbTreeGridDataSourceBuilder, NbTreeGridModule } from '@nebular/theme';
+import { CataloguesServiceService } from '../../services/catalogues-service.service';
 import { DataletDialogComponent } from './dialog/datalet-dialog.component';
-import { RefreshService } from '../../services/refresh.service';
-import { TranslateService } from '@ngx-translate/core';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
+import { NbCardModule } from '@nebular/theme';
+import { RouterModule } from '@angular/router';
+import { CommonModule } from '@angular/common';
 
 interface TreeNode<T> {
   data: T;
@@ -26,6 +28,7 @@ interface FSEntry {
   
 
 @Component({
+  imports: [NbCardModule, NbTreeGridModule, TranslateModule, NbButtonModule, RouterModule, NbIconModule, CommonModule, NbDialogModule ],
   selector: 'ngx-datalets-management',
   templateUrl: './datalets-management.component.html',
   styleUrls: ['./datalets-management.component.scss']
@@ -35,8 +38,7 @@ export class DataletsManagementComponent implements OnInit {
   constructor(private dataSourceBuilder: NbTreeGridDataSourceBuilder<FSEntry>,
 		private restApi:CataloguesServiceService,
 		private dialogService: NbDialogService,
-    public translation: TranslateService,
-    private refreshService: RefreshService, ) { }
+    public translation: TranslateService ) { }
 
     data: TreeNode<FSEntry>[] = [];
 
@@ -50,7 +52,6 @@ export class DataletsManagementComponent implements OnInit {
     sortDirection: NbSortDirection = NbSortDirection.NONE;
 
   ngOnInit(): void {
-    this.refreshService.refreshPageOnce('admin-configuration');
     this.listDatalets();
   }
 
@@ -95,8 +96,6 @@ export class DataletsManagementComponent implements OnInit {
   }
 
 	handleIFrameDataletOpenModal(datalet) {
-    console.log(datalet);
-		
 		this.dialogService.open(DataletDialogComponent, {
       context: {
         title: 'Create new prefix',

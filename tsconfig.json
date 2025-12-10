@@ -20,12 +20,11 @@
       "ES2022",
       "dom"
     ],
+    "skipLibCheck": true,
     "plugins": [
       { "name": "tslint-language-service"}
     ]
     
   },
-  "angularCompilerOptions": {
-    "enableIvy": false
-  }
+  "angularCompilerOptions": {}
 }

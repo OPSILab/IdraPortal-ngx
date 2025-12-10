@@ -1,10 +1,15 @@
 <nb-card>
     <nb-card-header>
-        Datalets
+      <div style="display:flex; justify-content:space-between; align-items:center; width:100%;">
+        <div>Datalets</div>
+        <button nbButton status="primary" (click)="close()">{{ 'CLOSE' | translate }}</button>
+      </div>
     </nb-card-header>
     <nb-card-body class="d-flex flex-column">
         <nb-select class="mb-2" size="small" placeholder="Select Showcase" [(selected)]="selected">
-            <nb-option *ngFor="let datalet of datalets" [value]='datalet'>{{datalet.title}}</nb-option>
+            @for (datalet of datalets; track $index) {
+                <nb-option [value]='datalet'>{{ datalet.title }}</nb-option>
+            }
         </nb-select>
        <div [innerHTML]="selected.datalet_html | safeHtml"></div>
     </nb-card-body>

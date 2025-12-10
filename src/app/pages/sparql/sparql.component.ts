@@ -1,9 +1,32 @@
 import { Component, Input, OnInit } from '@angular/core';
 import { DataCataglogueAPIService } from '../data-catalogue/services/data-cataglogue-api.service';
-import { CodeModel } from '@ngstack/code-editor';
-import { RefreshService } from '../services/refresh.service';
+import { CodeEditorComponent, CodeModel } from '@ngstack/code-editor';
+import { NbButtonModule, NbCardModule, NbCheckboxModule, NbDatepickerModule, NbIconModule, NbInputModule, NbListModule, NbSelectModule, NbTabsetModule, NbTagModule, NbToastrService, NbTooltipModule } from '@nebular/theme';
+import { TranslateModule } from '@ngx-translate/core';
+import { CarouselModule } from 'ngx-owl-carousel-o';
+import { MatCardModule } from '@angular/material/card';
+import { CommonModule } from '@angular/common';
 
 @Component({
+  standalone: true,
+  imports: [
+    CommonModule,
+    TranslateModule,
+    NbCardModule,
+    MatCardModule,
+    CarouselModule,
+    NbTabsetModule,
+    NbListModule,
+    NbIconModule,
+    NbTagModule,
+    NbIconModule,
+    NbButtonModule,
+    NbTooltipModule,
+    NbSelectModule,
+    NbInputModule,
+    NbDatepickerModule,
+  NbCheckboxModule,
+  CodeEditorComponent],
   selector: 'ngx-sparql',
   templateUrl: './sparql.component.html',
   styleUrls: ['./sparql.component.scss']
@@ -11,7 +34,7 @@ import { RefreshService } from '../services/refresh.service';
 export class SparqlComponent implements OnInit {
 
   constructor(
-      private refreshService: RefreshService,
+    private toastrService: NbToastrService,
     private restApi:DataCataglogueAPIService
   ) { }
 
@@ -55,12 +78,23 @@ LIMIT 50`,
     let query = this.model.value;
     // query = query.replace(/\n/g, ' ');
     let outputFormat = this.outputFormat;
-    this.restApi.executeSPARQLQuery(query, outputFormat).subscribe((data) => {
-      if(data?.result != null){
+
+      this.restApi.executeSPARQLQuery(query, outputFormat).subscribe({
+        next: (data) => {
+          console.log('result', data);
+          if (data?.result != null) {
         this.query_bck = query;
         this.updateCode(data.result);
-      }
-    });
+					this.toastrService.success('Query executed successfully', 'Success');
+          } else {
+        this.toastrService.warning('No results returned', 'Warning');
+          }
+        },
+        error: (err) => {
+          console.error('SPARQL query error', err);
+          this.toastrService.danger('Failed to execute query', 'Error');
+        }
+      });
   }
 
   back() {
@@ -87,7 +121,6 @@ LIMIT 50`,
   }
 
   ngOnInit(): void {
-    this.refreshService.refreshPageOnce('admin-configuration');
   }
 
 }

@@ -20,3 +20,27 @@
     width: 150px;
 }
   
+::ng-deep nb-card {
+  background-color: var(--card-background-color); 
+}
+
+/* Statistics page uses Bootstrap-like .card markup; ensure it follows the active Nebular theme */
+:host ::ng-deep .card {
+    background-color: var(--card-background-color) !important;
+    color: var(--text-basic-color) !important;
+    border-color: var(--border-basic-color-3) !important;
+}
+
+:host ::ng-deep .card-header,
+:host ::ng-deep .card-body {
+    background-color: var(--card-background-color) !important;
+    color: var(--text-basic-color) !important;
+}
+
+:host ::ng-deep .card-header {
+    border-bottom-color: var(--border-basic-color-3) !important;
+}
+
+:host ::ng-deep .card-title {
+    color: var(--text-basic-color) !important;
+}

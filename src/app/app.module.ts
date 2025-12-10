@@ -5,15 +5,12 @@
  */
 import { BrowserModule } from '@angular/platform-browser';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
-import { InjectionToken, NgModule } from '@angular/core';
-import { HttpClientModule, HttpClient, HTTP_INTERCEPTORS, HttpHeaders } from '@angular/common/http';
-import { ConfigModule, ConfigService } from 'ngx-config-json';
-import { TranslateHttpLoader } from "@ngx-translate/http-loader";
+import { NgModule } from '@angular/core';
+import { HttpClient, HTTP_INTERCEPTORS, provideHttpClient, withInterceptorsFromDi } from '@angular/common/http';
+import { ConfigModule } from 'ngx-config-json';
 import { CoreModule } from './@core/core.module';
 import { ThemeModule } from './@theme/theme.module';
-import { AppComponent } from './app.component';
 import { AppRoutingModule } from './app-routing.module';
-// import { NgxAuthRoutingModule } from './auth-routing.module_old';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import {
@@ -30,12 +27,11 @@ import {
   NbSidebarService
 } from '@nebular/theme';
 import { TranslateModule, TranslateLoader } from '@ngx-translate/core';
-import { NbRoleProvider, NbSecurityModule } from '@nebular/security';
-// import { NbPasswordAuthStrategy, NbAuthModule } from '@nebular/auth';
+import { NbSecurityModule } from '@nebular/security';
 import { MarkdownModule } from 'ngx-markdown';
 import { RouterModule } from '@angular/router';
 import { NgxEchartsModule } from 'ngx-echarts';
-import { CodeEditorModule } from '@ngstack/code-editor';
+import { provideCodeEditor } from '@ngstack/code-editor';
 import { NbAuthModule,  NbOAuth2AuthStrategy, NbOAuth2ClientAuthMethod, NbOAuth2GrantType, NbOAuth2ResponseType } from '@nebular/auth';
 import { environment } from '../environments/environment';
 import { OidcJWTToken } from './pages/auth/oidc/oidc';
@@ -47,49 +43,33 @@ class GenericConfig<T> {
   constructor(public config: T) {}
 }
 
-export function createTranslateLoader(http: HttpClient) {
-  return new TranslateHttpLoader(http, './assets/i18n/', '.json');
-}
 const URL = 'https://raw.githubusercontent.com/BeOpen-project/IdraPortal-ngx-Translations';
 
 export class CustomTranslateLoader implements TranslateLoader {
-  contentHeader = new HttpHeaders({
-  });
+  
   constructor(private httpClient: HttpClient) { }
 
   getTranslation(lang: string): Observable<any> {
     const url = `${URL}/main/v1.0/${lang}.json`;
-    const extUrl = `${URL}/main/v1.1/ext/${lang}.json`;
-
-    // let idra = this.httpClient.get(url,{ withCredentials: true });
     let idra = this.httpClient.get(url);
-    
    return idra;
   }
 }
 
 @NgModule({
-  declarations: [AppComponent, 
-    // AuthLogoutComponent
-  ],
   imports: [
-  
     NgxEchartsModule.forRoot({
       echarts: () => import('echarts')
     }),
     CommonModule,
     FormsModule,
     RouterModule,
+    BrowserAnimationsModule,
     NbAlertModule,
     NbInputModule,
     NbButtonModule,
     NbCheckboxModule,
-    // NgxAuthRoutingModule,
-
-    NbAuthModule,
     BrowserModule,
-    BrowserAnimationsModule,
-    HttpClientModule,
     AppRoutingModule,
     NbSidebarModule.forRoot(),
     NbMenuModule.forRoot(),
@@ -100,13 +80,12 @@ export class CustomTranslateLoader implements TranslateLoader {
     CoreModule.forRoot(),
     ThemeModule.forRoot(),
     MarkdownModule.forRoot(),
-    CodeEditorModule.forRoot(),
     ConfigModule.forRoot({
       pathToConfig: 'assets/config.json',
       configType: GenericConfig
     }),
     TranslateModule.forRoot({
-      defaultLanguage: 'en',
+      fallbackLang: 'en',
       loader: {
         provide: TranslateLoader,
         useClass: CustomTranslateLoader,
@@ -135,7 +114,6 @@ export class CustomTranslateLoader implements TranslateLoader {
         }
       }
     }),
-    // changes must be done in app.component.ts
     NbAuthModule.forRoot({
       strategies: [
         NbOAuth2AuthStrategy.setup({
@@ -185,7 +163,6 @@ export class CustomTranslateLoader implements TranslateLoader {
           defaultMessages: ['You have been successfully logged in.'],
         },
         logout: {
-          // ...
           alwaysFail: false,
           endpoint: '/logout',
           method: 'post',
@@ -245,9 +222,10 @@ export class CustomTranslateLoader implements TranslateLoader {
       },
     }),
   ],
-  providers: [NbSidebarService,
-
-  
+  providers: [
+    NbSidebarService,
+    provideHttpClient(withInterceptorsFromDi()),
+    provideCodeEditor(),
     {
       provide: HTTP_INTERCEPTORS,
       useClass: TokenInterceptor,
@@ -259,9 +237,7 @@ export class CustomTranslateLoader implements TranslateLoader {
       multi: true,
     },
     JwtHelperService,
-   
-  ],
-  bootstrap: [AppComponent],
+  ]
 })
 export class AppModule {
 }

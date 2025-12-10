@@ -1,6 +1,9 @@
 <nb-card >
     <nb-card-header>
-      {{ title }}
+      <div style="display:flex; justify-content:space-between; align-items:center; width:100%;">
+        <div>{{ title }}</div>
+        <button nbButton status="primary" (click)="close()">{{ 'CLOSE' | translate }}</button>
+      </div>
     </nb-card-header>
     <nb-card-body >
       <div class="card" [nbSpinner]="loading" nbSpinnerStatus="primary">
@@ -8,9 +11,4 @@
           </div>
       </div>
     </nb-card-body>
-  <nb-card-footer>
-    <div class="button-container">
-      <button nbButton status="primary" (click)="close()">{{ 'CLOSE' | translate }}</button>
-    </div>
-  </nb-card-footer>
   </nb-card>

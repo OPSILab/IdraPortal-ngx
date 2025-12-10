@@ -1,6 +1,8 @@
 import { Component, OnInit, ElementRef } from '@angular/core';
-import { NbTagComponent, NbTagInputAddEvent } from '@nebular/theme';
-import { DCATDataset, FormatCount } from '../model/dcatdataset';
+import { NbCardModule, NbSpinnerModule, NbTagComponent, NbTagInputAddEvent, NbTagModule, NbListModule, NbIconModule, NbCheckboxModule, NbTooltipModule } from '@nebular/theme';
+import { NgxPaginationModule } from 'ngx-pagination';
+import { NbEvaIconsModule } from '@nebular/eva-icons';
+import { DCATDataset,FormatCount } from '../model/dcatdataset';
 import { ODMSCatalogueInfo } from '../model/odmscatalogue-info';
 import { SearchFacet } from '../model/search-facet';
 import { SearchFilter } from '../model/search-filter';
@@ -9,9 +11,28 @@ import { SearchResult } from '../model/search-result';
 import { DataCataglogueAPIService } from '../services/data-cataglogue-api.service';
 import { Router } from '@angular/router';
 import { Observable } from 'rxjs';
-import { TranslateService } from '@ngx-translate/core';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
+import { CommonModule } from '@angular/common';
+import { RouterModule } from '@angular/router';
 
 @Component({
+  standalone: true,
+  imports: [
+    CommonModule,
+    TranslateModule,
+    RouterModule,
+    // Nebular UI modules used in template
+    NbCardModule,
+    NbSpinnerModule,
+    NbTagModule,
+    NbListModule,
+    NbIconModule,
+    NbCheckboxModule,
+    NbTooltipModule,
+    NbEvaIconsModule,
+    // Third-party
+    NgxPaginationModule,
+  ],
   selector: 'ngx-search',
   templateUrl: './search.component.html',
   styleUrls: ['./search.component.scss']
@@ -38,64 +59,74 @@ export class SearchComponent implements OnInit {
   currentDatasets: number = 0;
 
   filters: Array<string> = [];
-  filtersTags: Array<string> = [];
+  filtersTags: Array<string>= [];
   isHVD_Dataset: boolean | null = null; // null = show all
 
-  ngOnInit(): void {
-    this.searchResponse.facets = [];
-    this.loading = true
-    this.restApi.getCataloguesInfo().subscribe(infos => {
-      this.cataloguesInfos = infos;
-      this.searchRequest.nodes = infos.map(x => x.id)
-      this.loading = false
+  ngOnDestroy() {
+  }
 
-      let searchParam = this.router.routerState.snapshot.root.queryParams
+  ngOnInit(): void { 
+    // Ensure stable defaults before first render
+    this.searchRequest.rows = this.searchRequest.rows || 10;
+    this.searchRequest.start = this.searchRequest.start || 0;
+    this.searchResponse.facets = this.searchResponse.facets || [];
+    (this.searchResponse as any).results = (this.searchResponse as any).results || [];
+    (this.searchResponse as any).count = (this.searchResponse as any).count || 0;
+    this.loading=true
+    this.restApi.getCataloguesInfo().subscribe({
+      next: (infos) =>{
+        this.cataloguesInfos = infos;
+        this.searchRequest.nodes = infos.map(x=>x.id)
+        this.loading=false
 
-      console.log(searchParam)
-      if (searchParam['advancedSearch'] == 'true') {
-        this.searchRequest = JSON.parse(searchParam['params']);
-        // Update the local HVD state from the search request
-        if (this.searchRequest.hasHvdCategory) {
-          this.isHVD_Dataset = true;
-        }
-        // this.filtersTags = searchParam['params'].filters.map(x=>x.value);
-        this.searchDataset(true)
-      } else {
-        if (searchParam['type'] != undefined) {
-          this.searchRequest.filters.push(new SearchFilter('catalogues', searchParam.search_value))
+        let searchParam = this.router.routerState.snapshot.root.queryParams
+
+        console.log(searchParam)
+        if(searchParam['advancedSearch'] == 'true'){
+          this.searchRequest = JSON.parse(searchParam['params']);
+          // Update the local HVD state from the search request
+          if(this.searchRequest.hasHvdCategory) {
+            this.isHVD_Dataset = true;
+          }
+          // this.filtersTags = searchParam['params'].filters.map(x=>x.value);
           this.searchDataset(true)
+        } else{
+          if(searchParam['type']!=undefined){
+            this.searchRequest.filters.push(new SearchFilter('catalogues',searchParam.search_value))
+            this.searchDataset(true)
+          }
+          else if(searchParam['name']!=undefined){
+            // this.filtersTags.push(searchParam.name)
+            this.searchRequest.filters.push(new SearchFilter('tags',searchParam.search_value))
+            this.searchDataset(true)
+          }
+          else if(searchParam['text']!=undefined){
+            // this.filtersTags.push(searchParam.value)
+            this.searchRequest.filters.push(new SearchFilter('datasetThemes',searchParam.search_value))
+            this.searchDataset(true)
+          }
+          else if(searchParam['tags']!=undefined){
+            let tags = searchParam.tags.split(',')
+            // tags.forEach(element => {
+            //   this.filtersTags.push(element)
+            // });
+            this.searchRequest.filters.push(new SearchFilter('tags',searchParam.tags))
+            this.searchDataset(true)
+          } 
+          else if(searchParam['all']!=undefined){
+            let tags = searchParam.all.split(',')
+            this.searchRequest.filters.push(new SearchFilter('ALL',searchParam.all))
+            this.searchDataset(true)
+          } else{
+            this.searchDataset(true)
+          }
         }
-        else if (searchParam['name'] != undefined) {
-          // this.filtersTags.push(searchParam.name)
-          this.searchRequest.filters.push(new SearchFilter('tags', searchParam.search_value))
-          this.searchDataset(true)
-        }
-        else if (searchParam['text'] != undefined) {
-          // this.filtersTags.push(searchParam.value)
-          this.searchRequest.filters.push(new SearchFilter('datasetThemes', searchParam.search_value))
-          this.searchDataset(true)
-        }
-        else if (searchParam['tags'] != undefined) {
-          let tags = searchParam.tags.split(',')
-          // tags.forEach(element => {
-          //   this.filtersTags.push(element)
-          // });
-          this.searchRequest.filters.push(new SearchFilter('tags', searchParam.tags))
-          this.searchDataset(true)
-        }
-        else if (searchParam['all'] != undefined) {
-          let tags = searchParam.all.split(',')
-          this.searchRequest.filters.push(new SearchFilter('ALL', searchParam.all))
-          this.searchDataset(true)
-        } else {
-          this.searchDataset(true)
-        }
+
+      },error: err =>{ 
+        console.log(err);
+        this.loading=false;
       }
-
-    }, err => {
-      console.log(err);
-      this.loading = false;
-    })
+    });
   }
 
   updateFilters(tags) {
@@ -103,14 +134,15 @@ export class SearchComponent implements OnInit {
     this.searchDataset()
   }
 
+
+
   toggleHasHVDCategory(value: boolean) {
     if (this.isHVD_Dataset === value) {
-      // Uncheck if already checked
       this.isHVD_Dataset = null;
     } else {
+      this.searchRequest.hasHvdCategory = undefined;
       this.isHVD_Dataset = value;
     }
-    // Update searchRequest accordingly
     this.searchRequest.hasHvdCategory = this.isHVD_Dataset;
     this.searchDataset();
   }
@@ -145,21 +177,22 @@ export class SearchComponent implements OnInit {
       }
     })
 
-    this.restApi.searchDatasets(this.searchRequest).subscribe(
-      res => {
-        this.searchResponse = res
-        this.currentDatasets = this.searchResponse.count;
-        if (isFirst) {
-          this.totalDatasets = this.searchResponse.count;
+    this.restApi.searchDatasets(this.searchRequest).subscribe({
+      next: (res)=>{
+        this.searchResponse=res
+        this.currentDatasets = this.searchResponse.count;  
+        if(isFirst){
+          this.totalDatasets = this.searchResponse.count;  
         }
         this.searchResponse.results.map((x: DCATDataset) => { this.processDataset(x) })
         this.loading = false;
       },
-      err => {
+      error: (err)=>{
         console.log(err);
-        this.loading = false;
-      });
-    // create an observable of this.searchResponse
+        this.loading=false;
+      }
+    });
+// create an observable of this.searchResponse
 
     return new Observable<SearchResult>(observer => {
       observer.next(this.searchResponse);

@@ -4,11 +4,14 @@ import { ODMSCatalogueInfo } from '../data-catalogue/model/odmscatalogue-info';
 import { SearchRequest } from '../data-catalogue/model/search-request';
 import { SearchResult } from '../data-catalogue/model/search-result';
 import { Router } from '@angular/router';
-import { NbTagComponent, NbTagInputAddEvent } from '@nebular/theme';
-import { TranslateService } from '@ngx-translate/core';
-import { RefreshService } from '../services/refresh.service';
+import { NbButton, NbButtonModule, NbCheckboxModule, NbDatepickerModule, NbIconModule, NbInputModule, NbListModule, NbSelectModule, NbTabsetModule, NbTagComponent, NbTagInputAddEvent, NbTagModule, NbTooltipModule } from '@nebular/theme';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
+import { CommonModule } from '@angular/common';
+import { error } from 'console';
 
 @Component({
+  standalone: true,
+  imports: [NbTagModule, NbIconModule, TranslateModule, NbTooltipModule, NbTabsetModule, NbListModule, CommonModule, NbButtonModule, NbSelectModule, NbInputModule, NbDatepickerModule, NbCheckboxModule],
   selector: 'ngx-home',
   templateUrl: './home.component.html',
   styleUrls: ['./home.component.scss']
@@ -17,8 +20,7 @@ export class HomeComponent implements OnInit {
 
   constructor(private restApi:DataCataglogueAPIService,
     private router: Router,
-    public translation: TranslateService,
-        private refreshService: RefreshService,
+    public translation: TranslateService
   ) { }
 
   cataloguesInfos: Array<ODMSCatalogueInfo>=[]
@@ -244,15 +246,15 @@ export class HomeComponent implements OnInit {
 	// 	{value:"TECH",icon:"tech",text:"Technology"},
 	// 	{value:"TRAN",icon:"tran",text:"Transport"}];
 
-	dcatThemes=[{value:"Agriculture, fisheries, forestry and food",icon:"agri",text:"Agriculture"}, //maybe
+	dcatThemes=[{value:"Agriculture, fisheries, forestry and food",icon:"agri",text:"Agriculture"}, //maybe ?
 		{value:"Economy and finance",icon:"econ",text:"Economy"}, //ok
-		{value:"Education, culture and sport",icon:"educ",text:"Education"}, //not ok
+		{value:"Education, culture and sport",icon:"educ",text:"Education"}, //not ok -> ok
 		{value:"Energy",icon:"ener",text:"Energy"}, //ok
 		{value:"Environment",icon:"envi",text:"Environment"}, //ok
-		{value:"Government and public sector",icon:"gove",text:"Government"}, //ok 
-		{value:"Health",icon:"heal",text:"Health"}, //maybe
-		{value:"International issues",icon:"intr",text:"International"}, //maybe
-		{value:"Justice, legal system and public safety",icon:"just",text:"Justice"}, //not ok
+		{value:"Government and public sector",icon:"gove",text:"Government"}, //ok
+		{value:"Health",icon:"heal",text:"Health"}, //maybe ?
+		{value:"International issues",icon:"intr",text:"International"}, //maybe ?
+		{value:"Justice, legal system and public safety",icon:"just",text:"Justice"}, //not ok -> ok
 		{value:"Regions and cities",icon:"regi",text:"Regions"}, //ok
 		{value:"Population and society",icon:"soci",text:"Population"}, //ok
 		{value:"Science and technology",icon:"tech",text:"Technology"}, //ok
@@ -260,34 +262,36 @@ export class HomeComponent implements OnInit {
 
     
   ngOnInit(): void {
-    this.refreshService.refreshPageOnce('admin-configuration');
-    
-    this.restApi.getCataloguesInfo().subscribe(infos =>{
-      this.cataloguesInfos = infos;
-      this.searchRequest.nodes = infos.map(x=>x.id)
-      this.selectedCatalogues = infos.map(x=>x.id);
-      this.selectedCatalogues.unshift(0);
-      this.selectedCatalogues_prev = this.selectedCatalogues;
-      this.restApi.searchDatasets(this.searchRequest).subscribe(
-        res=>{
-            this.totalDatasets = res.count;
-            let tags = res.facets.find(x=>x.displayName=="Tags").values;
-            tags = tags.map(x=>{return {name:x.keyword, search_value:x.search_value}})
-            // shuffle tags
-            for(let i=tags.length-1; i>0; i--){
-              const j = Math.floor(Math.random() * i)
-              const temp = tags[i]
-              tags[i] = tags[j]
-              tags[j] = temp
-            }
-            this.tags = tags.slice(0,30);
-            this.classes = this.tags.map(x=>this.randomClass());
-        },
-        err=>{
-          console.log(err);
+    this.restApi.getCataloguesInfo().subscribe({
+      next: (infos) =>{
+        this.cataloguesInfos = infos;
+        this.searchRequest.nodes = infos.map(x=>x.id)
+        this.selectedCatalogues = infos.map(x=>x.id);
+        this.selectedCatalogues.unshift(0);
+        this.selectedCatalogues_prev = this.selectedCatalogues;
+        this.restApi.searchDatasets(this.searchRequest).subscribe({
+          next: (res)=>{
+              this.totalDatasets = res.count;
+              let tags = res.facets.find(x=>x.displayName=="Tags").values;
+              tags = tags.map(x=>{return {name:x.keyword, search_value:x.search_value}})
+              // shuffle tags
+              for(let i=tags.length-1; i>0; i--){
+                const j = Math.floor(Math.random() * i)
+                const temp = tags[i]
+                tags[i] = tags[j]
+                tags[j] = temp
+              }
+              this.tags = tags.slice(0,30);
+              this.classes = this.tags.map(x=>this.randomClass());
+          },
+          error: (err)=>{
+            console.log(err);
+          }
         });
-    },err=>{
-      console.log(err);
+      },
+      error: (err)=>{
+        console.log(err);
+      }
     })
   }
 
