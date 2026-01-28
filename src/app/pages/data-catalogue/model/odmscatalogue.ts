@@ -1,3 +1,8 @@
+import { DcatCatalogueRecord } from "./dcatcataloguerecord";
+import { DcatDataService } from "./dcatdataservice";
+import { DCTLocation } from "./dctlocation";
+import { DCTPeriodOfTime } from "./dctperiod-of-time";
+import { FOAFAgent } from "./foafagent";
 import { ODMSCatalogueImage } from "./odmscatalogue-image";
 import { ODMSCatalogueType } from "./odmscatalogue-type.enum";
 
@@ -20,6 +25,12 @@ export class ODMSCatalogue {
     isActive?: boolean;
     country?: string;
     category?: string;
+    applicableLegislation?: string[];
+    creator?: FOAFAgent;
+    geographicalCoverage?: DCTLocation[];
+    record?: DcatCatalogueRecord[];
+    service?: DcatDataService[];
+    temporalCoverage?: DCTPeriodOfTime[];
 
     constructor() { }
 }

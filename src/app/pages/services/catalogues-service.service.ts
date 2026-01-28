@@ -132,12 +132,15 @@ export class CataloguesServiceService {
   activeCatalogue(id:string):Promise<any>{
     return new Promise((resolve,reject)=>{
       this.http.put<any>(`${this.apiEndpoint}/Idra/api/v1/administration/catalogues/${id}/activate`, null)
-      .subscribe((data: any) => {
-        resolve(data)
-        return data
-      }, error => {
-        reject(error)
-        return error
+      .subscribe({
+        next: (data: any) => {
+          resolve(data)
+          return data
+        },
+        error: error => {
+          reject(error)
+          return error
+        }
       })
     })
   }
@@ -145,12 +148,15 @@ export class CataloguesServiceService {
   deactiveCatalogue(id:string, keepDatasets:boolean):Promise<any>{
     return new Promise((resolve,reject)=>{
       this.http.put<any>(`${this.apiEndpoint}/Idra/api/v1/administration/catalogues/${id}/deactivate?keepDatasets=`+keepDatasets, null)
-      .subscribe((data: any) => {
-        resolve(data)
-        return data
-      }, error => {
-        reject(error)
-        return error
+      .subscribe({
+        next: (data: any) => {
+          resolve(data)
+          return data
+        },
+        error: error => {
+          reject(error)
+          return error
+        }
       })
     })
   }
@@ -158,12 +164,15 @@ export class CataloguesServiceService {
   deleteCatalogue(id:string):Promise<any>{
     return new Promise((resolve,reject)=>{
       this.http.delete<any>(`${this.apiEndpoint}/Idra/api/v1/administration/catalogues/${id}`)
-      .subscribe((data: any) => {
-        resolve(data)
-        return data
-      }, error => {
-        reject(error)
-        return error
+      .subscribe({
+        next: (data: any) => {
+          resolve(data)
+          return data
+        }, 
+        error: error => {
+          reject(error)
+          return error
+        }
       })
     })
   }
@@ -181,12 +190,15 @@ export class CataloguesServiceService {
     
     return new Promise((resolve,reject)=>{
       this.http.post<any>(`${this.apiEndpoint}/Idra/api/v1/administration/catalogues/${id}/synchronize`,null)
-      .subscribe((data: any) => {
-        resolve(data)
-        return data
-      }, error => {
-        reject(error)
-        return error
+      .subscribe({
+        next: (data: any) => {
+          resolve(data)
+          return data
+        },
+        error: error => {
+          reject(error)
+          return error
+        }
       })
     })
   }
@@ -210,16 +222,19 @@ export class CataloguesServiceService {
       },
       
       )
-      .subscribe((data: any) => {
-        this.toastr.show('Analisys submitted', 'Success', { status: 'success', duration: 3000, destroyByClick: true, position: NbGlobalPhysicalPosition.TOP_RIGHT});
-        
-        resolve(data)
-        return data
-      }, error => {
-        this.toastr.show("There was an error", 'Error', { status: 'danger', duration: 3000, destroyByClick: true, position: NbGlobalPhysicalPosition.TOP_RIGHT});
-        
-        reject(error)
-        return error
+      .subscribe({
+        next: (data: any) => {
+          this.toastr.show('Analisys submitted', 'Success', { status: 'success', duration: 3000, destroyByClick: true, position: NbGlobalPhysicalPosition.TOP_RIGHT});
+          
+          resolve(data)
+          return data
+        },
+        error: error => {
+          this.toastr.show("There was an error", 'Error', { status: 'danger', duration: 3000, destroyByClick: true, position: NbGlobalPhysicalPosition.TOP_RIGHT});
+          
+          reject(error)
+          return error
+        }
       })
     })
   }

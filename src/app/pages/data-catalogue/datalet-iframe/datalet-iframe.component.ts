@@ -1,9 +1,10 @@
 import { Component, OnInit } from '@angular/core';
-import { NbDialogRef } from '@nebular/theme';
+import { NbCardModule, NbDialogRef, NbSpinnerModule } from '@nebular/theme';
 import { ConfigService } from 'ngx-config-json';
-import { DCATDistribution } from '../model/dcatdistribution';
+import { SafePipe } from '../../../@theme/pipes';
 
 @Component({
+  imports: [NbCardModule, NbSpinnerModule, SafePipe],
   selector: 'ngx-datalet-iframe',
   templateUrl: './datalet-iframe.component.html',
   styleUrls: ['./datalet-iframe.component.scss']

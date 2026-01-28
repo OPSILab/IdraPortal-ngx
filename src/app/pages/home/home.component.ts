@@ -3,13 +3,15 @@ import { DataCataglogueAPIService } from '../data-catalogue/services/data-catagl
 import { ODMSCatalogueInfo } from '../data-catalogue/model/odmscatalogue-info';
 import { SearchRequest } from '../data-catalogue/model/search-request';
 import { SearchResult } from '../data-catalogue/model/search-result';
-import { randomInt } from 'crypto';
 import { Router } from '@angular/router';
-import { NbTagComponent, NbTagInputAddEvent } from '@nebular/theme';
-import { TranslateService } from '@ngx-translate/core';
-import { RefreshService } from '../services/refresh.service';
+import { NbButton, NbButtonModule, NbCheckboxModule, NbDatepickerModule, NbIconModule, NbInputModule, NbListModule, NbSelectModule, NbTabsetModule, NbTagComponent, NbTagInputAddEvent, NbTagModule, NbTooltipModule } from '@nebular/theme';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
+import { CommonModule } from '@angular/common';
+import { error } from 'console';
 
 @Component({
+  standalone: true,
+  imports: [NbTagModule, NbIconModule, TranslateModule, NbTooltipModule, NbTabsetModule, NbListModule, CommonModule, NbButtonModule, NbSelectModule, NbInputModule, NbDatepickerModule, NbCheckboxModule],
   selector: 'ngx-home',
   templateUrl: './home.component.html',
   styleUrls: ['./home.component.scss']
@@ -18,8 +20,7 @@ export class HomeComponent implements OnInit {
 
   constructor(private restApi:DataCataglogueAPIService,
     private router: Router,
-    public translation: TranslateService,
-    private refreshService: RefreshService,
+    public translation: TranslateService
   ) { }
 
   cataloguesInfos: Array<ODMSCatalogueInfo>=[]
@@ -29,13 +30,14 @@ export class HomeComponent implements OnInit {
   searchResponse:SearchResult=new SearchResult();
   searchRequest:SearchRequest=new SearchRequest();
   advancedSearch:boolean=false;
+  lastKeyPressed: string | null = null;
   searchToggleIcon:string="arrow-ios-downward-outline";
   Filters: Array<any> = [{type: 'ALL', tags: []}];
   selectableOptions: Array<string> = [];
   options: Array<any> = ['description', 'tags', 'title'];
 
-  releasedDate: Array<Date> = [];
-  updatedDate: Array<Date> = [];
+  releasedDate: Array<String> = [];
+  updatedDate: Array<String> = [];
   
   catalogueList: Array<any> = [];
   selectedCatalogues: Array<number> = [0];
@@ -58,9 +60,19 @@ export class HomeComponent implements OnInit {
   sortyBy: number = 4;
   order: number = 0;
   multiLanguageChecked = false;
+  isHVD_Dataset = false;
 
   toggleMultiLanguage(checked: boolean) {
     this.multiLanguageChecked = checked;
+  }
+
+  toggleHasHVDCategory(checked: boolean) {
+    if (checked) {
+      this.isHVD_Dataset = true;
+    }
+    else {
+      this.isHVD_Dataset = false;
+    }
   }
 
   toggleAdvancedSearch(){
@@ -94,18 +106,23 @@ export class HomeComponent implements OnInit {
   }
 
   onTagAddOnFilter({ value, input }: NbTagInputAddEvent, index: number): void {
-    if(input != undefined )
-      input.nativeElement.value = ''
-    if (value) {
-      this.Filters[index].tags.push(value.substring(0,value.length-1));
-    }
+    setTimeout(() => {
+      if (input != undefined)
+        input.nativeElement.value = '';
+      if (value) {
+        this.Filters[index].tags.push(value);
+        if (this.lastKeyPressed === 'Enter') {
+          this.advancedSearchReq();
+        }
+      }
+    }, 50);
   }
 
   advancedSearchReq(){
     if(!this.advancedSearch){
       this.router.navigate(['/pages/datasets'], {
         queryParams:{
-          tags: this.tagsFilter.join(','),
+          all: this.tagsFilter.join(','),
           advancedSearch: false
         }
       })
@@ -116,6 +133,9 @@ export class HomeComponent implements OnInit {
           filters.push({field: filter.type, value: filter.tags.join(',')});
         }
       });
+      if(this.Filters.length == 1 && this.Filters[0].type == 'ALL' && this.Filters[0].tags.length == 0){
+        filters.push({field: 'ALL', value: ''});
+      }
       let selectedCatalogues
       if(this.selectedCatalogues.includes(0)){
         selectedCatalogues = this.selectedCatalogues.filter(x=>x!=0);
@@ -158,22 +178,27 @@ export class HomeComponent implements OnInit {
           targetLanguages: []
         }
       }
+      if(this.isHVD_Dataset){
+        params['hasHvdCategory'] = true;
+      }
       if(this.multiLanguageChecked){
         params.euroVocFilter.sourceLanguage = this.sourceLanguage;
         params.euroVocFilter.targetLanguages = this.targetsLanguage;
       }
+      console.log("dates: ",this.releasedDate, this.updatedDate)
       if(this.releasedDate.length > 0){
-        params['releasedDate'] = {
+        params['releaseDate'] = {
           start: this.releasedDate[0],
           end: this.releasedDate[1]
         }
       }
       if(this.updatedDate.length > 0){
-        params['updatedDate'] = {
+        params['updateDate'] = {
           start: this.updatedDate[0],
           end: this.updatedDate[1]
         }
       }
+      console.log("params: ", params)
       this.router.navigate(['/pages/datasets'], {
         queryParams: { params: JSON.stringify(params), advancedSearch: true }
       })
@@ -182,10 +207,14 @@ export class HomeComponent implements OnInit {
   }
 
   updateDate(event:any, type:number){
+    let start = new Date(event.start);
+    let end = new Date(event.end);
+    let start_string = new Date(Date.UTC(start.getFullYear(), start.getMonth(), start.getDate(), 0, 0, 0)).toISOString();
+    let end_string = new Date(Date.UTC(end.getFullYear(), end.getMonth(), end.getDate(), 0, 0, 0)).toISOString();
     if(type == 0){
-      this.releasedDate = event;
+      this.releasedDate = [start_string, end_string];
     } else {
-      this.updatedDate = event;
+      this.updatedDate = [start_string, end_string];
     }
   }
 
@@ -217,51 +246,52 @@ export class HomeComponent implements OnInit {
 	// 	{value:"TECH",icon:"tech",text:"Technology"},
 	// 	{value:"TRAN",icon:"tran",text:"Transport"}];
 
-	dcatThemes=[{value:"Agriculture, fisheries, forestry and food",icon:"agri",text:"Agriculture"},
-		{value:"Economy and finance",icon:"econ",text:"Economy"},
-		{value:"Education, culture and sport",icon:"educ",text:"Education"},
-		{value:"Energy",icon:"ener",text:"Energy"},
-		{value:"Environment",icon:"envi",text:"Environment"},
-		{value:"Government and public sector",icon:"gove",text:"Government"},
-		{value:"Health",icon:"heal",text:"Health"},
-		{value:"International issues",icon:"intr",text:"International"},
-		{value:"Justice, legal system and public safety",icon:"just",text:"Justice"},
-		{value:"Regions and cities",icon:"regi",text:"Regions"},
-		{value:"Population and society",icon:"soci",text:"Population"},
-		{value:"Science and technology",icon:"tech",text:"Technology"},
-		{value:"Transport",icon:"tran",text:"Transport"}];
+	dcatThemes=[{value:"Agriculture, fisheries, forestry and food",icon:"agri",text:"Agriculture"}, //maybe ?
+		{value:"Economy and finance",icon:"econ",text:"Economy"}, //ok
+		{value:"Education, culture and sport",icon:"educ",text:"Education"}, //not ok -> ok
+		{value:"Energy",icon:"ener",text:"Energy"}, //ok
+		{value:"Environment",icon:"envi",text:"Environment"}, //ok
+		{value:"Government and public sector",icon:"gove",text:"Government"}, //ok
+		{value:"Health",icon:"heal",text:"Health"}, //maybe ?
+		{value:"International issues",icon:"intr",text:"International"}, //maybe ?
+		{value:"Justice, legal system and public safety",icon:"just",text:"Justice"}, //not ok -> ok
+		{value:"Regions and cities",icon:"regi",text:"Regions"}, //ok
+		{value:"Population and society",icon:"soci",text:"Population"}, //ok
+		{value:"Science and technology",icon:"tech",text:"Technology"}, //ok
+		{value:"Transport",icon:"tran",text:"Transport"}]; //ok
 
     
   ngOnInit(): void {
-    this.refreshService.refreshPageOnce('admin-configuration');
-    this.refreshService.refreshPageOnce('admin-configuration');
-    
-    this.restApi.getCataloguesInfo().subscribe(infos =>{
-      this.cataloguesInfos = infos;
-      this.searchRequest.nodes = infos.map(x=>x.id)
-      this.selectedCatalogues = infos.map(x=>x.id);
-      this.selectedCatalogues.unshift(0);
-      this.selectedCatalogues_prev = this.selectedCatalogues;
-      this.restApi.searchDatasets(this.searchRequest).subscribe(
-        res=>{
-            this.totalDatasets = res.count;
-            let tags = res.facets.find(x=>x.displayName=="Tags").values;
-            tags = tags.map(x=>{return {name:x.keyword, search_value:x.search_value}})
-            // shuffle tags
-            for(let i=tags.length-1; i>0; i--){
-              const j = Math.floor(Math.random() * i)
-              const temp = tags[i]
-              tags[i] = tags[j]
-              tags[j] = temp
-            }
-            this.tags = tags.slice(0,30);
-            this.classes = this.tags.map(x=>this.randomClass());
-        },
-        err=>{
-          console.log(err);
+    this.restApi.getCataloguesInfo().subscribe({
+      next: (infos) =>{
+        this.cataloguesInfos = infos;
+        this.searchRequest.nodes = infos.map(x=>x.id)
+        this.selectedCatalogues = infos.map(x=>x.id);
+        this.selectedCatalogues.unshift(0);
+        this.selectedCatalogues_prev = this.selectedCatalogues;
+        this.restApi.searchDatasets(this.searchRequest).subscribe({
+          next: (res)=>{
+              this.totalDatasets = res.count;
+              let tags = res.facets.find(x=>x.displayName=="Tags").values;
+              tags = tags.map(x=>{return {name:x.keyword, search_value:x.search_value}})
+              // shuffle tags
+              for(let i=tags.length-1; i>0; i--){
+                const j = Math.floor(Math.random() * i)
+                const temp = tags[i]
+                tags[i] = tags[j]
+                tags[j] = temp
+              }
+              this.tags = tags.slice(0,30);
+              this.classes = this.tags.map(x=>this.randomClass());
+          },
+          error: (err)=>{
+            console.log(err);
+          }
         });
-    },err=>{
-      console.log(err);
+      },
+      error: (err)=>{
+        console.log(err);
+      }
     })
   }
 
@@ -271,26 +301,17 @@ export class HomeComponent implements OnInit {
     this.tagsFilter = this.tagsFilter.filter(x => x!=tagToRemove.text);
   }
 
-  tagInputKeydown(event: KeyboardEvent): void {
-    if ((event.target as HTMLInputElement).value.charAt((event.target as HTMLInputElement).value.length-1) === ',') {
-      this.onTagAdd({ value: (event.target as HTMLInputElement).value, input: null });
-      (event.target as HTMLInputElement).value = '';
-    }
-  }
-
-  tagInputKeydownFilters(event: KeyboardEvent, i: number): void {
-    if ((event.target as HTMLInputElement).value.charAt((event.target as HTMLInputElement).value.length-1) === ',') {
-      this.onTagAddOnFilter({ value: (event.target as HTMLInputElement).value, input: null }, i);
-      (event.target as HTMLInputElement).value = '';
-    }
-  }
-
   onTagAdd({ value, input }: NbTagInputAddEvent): void {
-    if(input != undefined )
-    input.nativeElement.value = ''
-    if (value) {
-      this.tagsFilter.push(value.substring(0,value.length-1));
-    }
+    setTimeout(() => {
+      if (input != undefined)
+        input.nativeElement.value = '';
+      if (value) {
+        this.tagsFilter.push(value);
+        if (this.lastKeyPressed === 'Enter') {
+          this.advancedSearchReq();
+        }
+      }
+    }, 50);
   }
 
   randomClass(){
@@ -313,6 +334,6 @@ export class HomeComponent implements OnInit {
 
   searchCategory(category:any){
     console.log(category)
-    this.router.navigate(['/pages/datasets'], {queryParams:{search_value: category.text, text: category.value}})
+    this.router.navigate(['/pages/datasets'], {queryParams:{search_value: category.value, text: category.text}})
   }
 }

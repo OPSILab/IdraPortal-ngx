@@ -1,6 +1,6 @@
-import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { NbDialogService, NbToastrService } from '@nebular/theme';
+import { NbActionsModule, NbCardModule, NbDialogService, NbListModule, NbSpinnerModule, NbTagModule, NbToastrService, NbTooltipModule } from '@nebular/theme';
 import { ConfigService } from 'ngx-config-json';
 import { DataletIframeComponent } from '../datalet-iframe/datalet-iframe.component';
 import { DistributionComponent } from '../distribution/distribution.component';
@@ -12,10 +12,27 @@ import { ShowDataletsComponent } from '../show-datalets/show-datalets.component'
 import * as URLParse from 'url-parse';
 import { PreviewDialogComponent } from './preview-dialog/preview-dialog.component';
 import { GeoJsonDialogComponent } from './geojson-dialog/geojson-dialog.component';
-import { format } from 'path';
-import { RefreshService } from '../../services/refresh.service';
+import { TranslateModule } from '@ngx-translate/core';
+import { CommonModule } from '@angular/common';
+import { NgxPaginationModule } from 'ngx-pagination';
+import { MarkdownModule } from 'ngx-markdown';
 
 @Component({
+  standalone: true,
+  imports: [
+    CommonModule,
+    TranslateModule,
+    // Nebular
+    NbSpinnerModule,
+    NbCardModule,
+    NbActionsModule,
+    NbTooltipModule,
+    NbListModule,
+    NbTagModule,
+    // Third-party
+    MarkdownModule,
+    NgxPaginationModule,
+  ],
   selector: 'ngx-dataset',
   templateUrl: './dataset.component.html',
   styleUrls: ['./dataset.component.scss']
@@ -43,7 +60,6 @@ export class DatasetComponent implements OnInit {
     private toastrService: NbToastrService,
     private dialogService: NbDialogService,
     private configService: ConfigService<Record<string, any>>,
-    private refreshService: RefreshService,
     ) { 
       this.dataletBaseUrl = this.configService.config["datalet_base_url"];
       this.enableDatalet = this.configService.config["enable_datalet"];
@@ -52,8 +68,6 @@ export class DatasetComponent implements OnInit {
 
 
   ngOnInit(): void {
-    this.refreshService.refreshPageOnce('admin-configuration');
-
     let dataletOrigin = new URLParse(this.dataletBaseUrl);
     if(location.origin==dataletOrigin.origin){
       this.samedomain=true;
@@ -72,8 +86,8 @@ export class DatasetComponent implements OnInit {
 
   getDataset(){
     this.loading=true;
-    this.restApi.getDatasetById(this.id).subscribe(
-      res=>{ 
+    this.restApi.getDatasetById(this.id).subscribe({
+      next: (res)=>{ 
         this.dataset=res;
         let tmpLic=[]
         this.dataset.distributions.forEach( x => {
@@ -84,12 +98,12 @@ export class DatasetComponent implements OnInit {
         })
         this.loading=false;
      },
-      err=>{
+      error: (err)=>{
          this.loading=false;
          this.toastrService.danger(err.error.userMessage,"Error")
          this.router.navigate(['/pages/datasets']);
        }
-      )
+    });
   }
 
   openDistributionDetails(distribution:DCATDistribution){
@@ -175,8 +189,8 @@ export class DatasetComponent implements OnInit {
 
     this.loading = true;
     if (this.samedomain) {
-      this.restApi.downloadFromUri(distribution).subscribe(
-        res => {
+      this.restApi.downloadFromUri(distribution).subscribe({
+        next: (res) => {
           this.loading = false;
 
           this.dialogService.open(DataletIframeComponent, {
@@ -195,22 +209,22 @@ export class DatasetComponent implements OnInit {
             );
 
         },
-        err => {
+        error: err => {
           this.loading = false;
           this.toastrService.danger("File with url " + distribution.downloadURL + " returned " + err.status + "!", "Unable to create Datalet");
         }
-      )
+      });
     } else {
-      this.restApi.downloadFromUri(distribution).subscribe(
-        res => {
+      this.restApi.downloadFromUri(distribution).subscribe({
+        next: (res) => {
           this.loading = false;
           window.open(`${this.dataletBaseUrl}?ln=en&format=${parameter}&nodeID=${this.dataset.nodeID}&distributionID=${distribution.id}&datasetID=${this.dataset.id}&url=${encodeURIComponent(distribution.downloadURL)}`)
         },
-        err => {
+        error: err => {
           this.loading = false;
           this.toastrService.danger("File with url " + distribution.downloadURL + " returned " + err.status + "!", "Unable to create Datalet");
         }
-      )
+      });
     }
   }
 
@@ -243,8 +257,8 @@ export class DatasetComponent implements OnInit {
     else{
       if(this.checkDistributionFormat(distribution.format)){
         if(formatLower == "rdf"){
-          this.restApi.downloadRDFfromUrl(distribution).subscribe(
-            (res : string) => {
+          this.restApi.downloadRDFfromUrl(distribution).subscribe({
+            next: (res : string) => {
               console.log(res);
               this.dialogService.open(PreviewDialogComponent, {
                 context: {
@@ -253,10 +267,10 @@ export class DatasetComponent implements OnInit {
                 },
               })
             },
-            err => {
+            error: err => {
               this.toastrService.danger("Could not load the file", "Error");
             }
-          )
+          })
         } else {
           this.dialogService.open(PreviewDialogComponent, {
             context: {

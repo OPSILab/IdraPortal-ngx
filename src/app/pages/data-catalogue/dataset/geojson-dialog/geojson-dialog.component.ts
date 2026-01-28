@@ -1,5 +1,5 @@
 import { Component, ElementRef, Input, ViewChild } from '@angular/core';
-import { NbDialogRef, NbToastrService } from '@nebular/theme';
+import { NbButtonModule, NbCardModule, NbDialogRef, NbDialogService, NbSpinnerModule, NbToastrService } from '@nebular/theme';
 import { DCATDistribution } from '../../model/dcatdistribution';
 import { DataCataglogueAPIService } from '../../services/data-cataglogue-api.service';
 import * as L from "leaflet";
@@ -8,26 +8,36 @@ import * as shp from "shpjs";
 import * as toGeoJson from 'togeojson';
 import JSZip from 'jszip';
 import proj4 from "proj4";
+import { TranslateModule } from '@ngx-translate/core';
+import { PreviewDialogComponent } from '../preview-dialog/preview-dialog.component';
 
 @Component({
+  imports: [NbCardModule, NbSpinnerModule, TranslateModule, NbButtonModule],
   selector: 'ngx-remoteCatalogue-dialog',
   templateUrl: 'geojson-dialog.component.html',
   styleUrls: ['geojson-dialog.component.scss'],
 })
 export class GeoJsonDialogComponent {
 
+  close() {
+    this.ref.close();
+  }
+
   @Input() title: string;
   distribution: DCATDistribution;
   loading: boolean;
   type: string;
+  text: string;
 
   constructor(protected ref: NbDialogRef<GeoJsonDialogComponent>,
     private restApi: DataCataglogueAPIService,
     private toastrService: NbToastrService,
+    private dialogService: NbDialogService,
 ) {}
 
   ngOnInit() {
     this.loading = true;
+    L.Icon.Default.mergeOptions({ iconRetinaUrl: 'assets/leaflet/marker-icon-2x.png', iconUrl: 'assets/leaflet/marker-icon.png', shadowUrl: 'assets/leaflet/marker-shadow.png' })
     this.openMap(this.distribution);
   }
 
@@ -40,13 +50,13 @@ export class GeoJsonDialogComponent {
       this.map.remove(); // Rimuovi la mappa esistente se presente
     }
     const geoJsonData = JSON.parse(data) as GeoJSON.GeoJsonObject;
-    console.log(geoJsonData);
+    this.text = data;
+    // console.log(geoJsonData);
     globalThis.file_content = data;
 
     // Creazione mappa Leaflet
     // cicle to find the attribute coordinates
     let latLng = [0, 0];
-    let featuresLenght = Math.floor(geoJsonData['features'].length/2);
     // if(geoJsonData['features'][0]['geometry']['coordinates'] != undefined){
     //   latLng[0] += geoJsonData['features'][featuresLenght]['geometry']['coordinates'][1];
     //   latLng[1] += geoJsonData['features'][featuresLenght]['geometry']['coordinates'][0];
@@ -54,18 +64,36 @@ export class GeoJsonDialogComponent {
       // latLng[0] += geoJsonData['features'][0][0]['geometry']['coordinates'][1];
       // latLng[1] += geoJsonData['features'][0][0]['geometry']['coordinates'][0];
     // }
-    if(typeof geoJsonData['features'][featuresLenght]['geometry']['coordinates'][0] == 'number'){
-      latLng[0] += geoJsonData['features'][featuresLenght]['geometry']['coordinates'][1];
-      latLng[1] += geoJsonData['features'][featuresLenght]['geometry']['coordinates'][0];
-    } else if(typeof geoJsonData['features'][featuresLenght]['geometry']['coordinates'][0][0] == 'number'){
-      latLng[0] += geoJsonData['features'][featuresLenght]['geometry']['coordinates'][Math.floor(geoJsonData['features'][featuresLenght]['geometry']['coordinates'].length/2)][1];
-      latLng[1] += geoJsonData['features'][featuresLenght]['geometry']['coordinates'][Math.floor(geoJsonData['features'][featuresLenght]['geometry']['coordinates'].length/2)][0];
-    } else if(typeof geoJsonData['features'][featuresLenght]['geometry']['coordinates'][0][0][0] == 'number'){
-      latLng[0] += geoJsonData['features'][featuresLenght]['geometry']['coordinates'][Math.floor(geoJsonData['features'][featuresLenght]['geometry']['coordinates'].length/2)][Math.floor(geoJsonData['features'][featuresLenght]['geometry']['coordinates'][Math.floor(geoJsonData['features'][featuresLenght]['geometry']['coordinates'].length/2)].length/2)][1];
-      latLng[1] += geoJsonData['features'][featuresLenght]['geometry']['coordinates'][Math.floor(geoJsonData['features'][featuresLenght]['geometry']['coordinates'].length/2)][Math.floor(geoJsonData['features'][featuresLenght]['geometry']['coordinates'][Math.floor(geoJsonData['features'][featuresLenght]['geometry']['coordinates'].length/2)].length/2)][0];
-    } else if(typeof geoJsonData['features'][featuresLenght]['geometry']['coordinates'][0][0][0][0] == 'number'){
-      latLng[0] += geoJsonData['features'][featuresLenght]['geometry']['coordinates'][Math.floor(geoJsonData['features'][featuresLenght]['geometry']['coordinates'].length/2)][Math.floor(geoJsonData['features'][featuresLenght]['geometry']['coordinates'][Math.floor(geoJsonData['features'][featuresLenght]['geometry']['coordinates'].length/2)].length/2)][Math.floor(geoJsonData['features'][featuresLenght]['geometry']['coordinates'][Math.floor(geoJsonData['features'][featuresLenght]['geometry']['coordinates'].length/2)][Math.floor(geoJsonData['features'][featuresLenght]['geometry']['coordinates'][Math.floor(geoJsonData['features'][featuresLenght]['geometry']['coordinates'].length/2)].length/2)].length/2)][1];
-      latLng[1] += geoJsonData['features'][featuresLenght]['geometry']['coordinates'][Math.floor(geoJsonData['features'][featuresLenght]['geometry']['coordinates'].length/2)][Math.floor(geoJsonData['features'][featuresLenght]['geometry']['coordinates'][Math.floor(geoJsonData['features'][featuresLenght]['geometry']['coordinates'].length/2)].length/2)][Math.floor(geoJsonData['features'][featuresLenght]['geometry']['coordinates'][Math.floor(geoJsonData['features'][featuresLenght]['geometry']['coordinates'].length/2)][Math.floor(geoJsonData['features'][featuresLenght]['geometry']['coordinates'][Math.floor(geoJsonData['features'][featuresLenght]['geometry']['coordinates'].length/2)].length/2)].length/2)][0];
+    
+    try {
+      let featuresLenght = Math.floor(geoJsonData['features'].length/2);
+      if(typeof geoJsonData['features'][featuresLenght]['geometry']['coordinates'][0] == 'number'){
+        latLng[0] += geoJsonData['features'][featuresLenght]['geometry']['coordinates'][1];
+        latLng[1] += geoJsonData['features'][featuresLenght]['geometry']['coordinates'][0];
+      } else if(typeof geoJsonData['features'][featuresLenght]['geometry']['coordinates'][0][0] == 'number'){
+        latLng[0] += geoJsonData['features'][featuresLenght]['geometry']['coordinates'][Math.floor(geoJsonData['features'][featuresLenght]['geometry']['coordinates'].length/2)][1];
+        latLng[1] += geoJsonData['features'][featuresLenght]['geometry']['coordinates'][Math.floor(geoJsonData['features'][featuresLenght]['geometry']['coordinates'].length/2)][0];
+      } else if(typeof geoJsonData['features'][featuresLenght]['geometry']['coordinates'][0][0][0] == 'number'){
+        latLng[0] += geoJsonData['features'][featuresLenght]['geometry']['coordinates'][Math.floor(geoJsonData['features'][featuresLenght]['geometry']['coordinates'].length/2)][Math.floor(geoJsonData['features'][featuresLenght]['geometry']['coordinates'][Math.floor(geoJsonData['features'][featuresLenght]['geometry']['coordinates'].length/2)].length/2)][1];
+        latLng[1] += geoJsonData['features'][featuresLenght]['geometry']['coordinates'][Math.floor(geoJsonData['features'][featuresLenght]['geometry']['coordinates'].length/2)][Math.floor(geoJsonData['features'][featuresLenght]['geometry']['coordinates'][Math.floor(geoJsonData['features'][featuresLenght]['geometry']['coordinates'].length/2)].length/2)][0];
+      } else if(typeof geoJsonData['features'][featuresLenght]['geometry']['coordinates'][0][0][0][0] == 'number'){
+        latLng[0] += geoJsonData['features'][featuresLenght]['geometry']['coordinates'][Math.floor(geoJsonData['features'][featuresLenght]['geometry']['coordinates'].length/2)][Math.floor(geoJsonData['features'][featuresLenght]['geometry']['coordinates'][Math.floor(geoJsonData['features'][featuresLenght]['geometry']['coordinates'].length/2)].length/2)][Math.floor(geoJsonData['features'][featuresLenght]['geometry']['coordinates'][Math.floor(geoJsonData['features'][featuresLenght]['geometry']['coordinates'].length/2)][Math.floor(geoJsonData['features'][featuresLenght]['geometry']['coordinates'][Math.floor(geoJsonData['features'][featuresLenght]['geometry']['coordinates'].length/2)].length/2)].length/2)][1];
+        latLng[1] += geoJsonData['features'][featuresLenght]['geometry']['coordinates'][Math.floor(geoJsonData['features'][featuresLenght]['geometry']['coordinates'].length/2)][Math.floor(geoJsonData['features'][featuresLenght]['geometry']['coordinates'][Math.floor(geoJsonData['features'][featuresLenght]['geometry']['coordinates'].length/2)].length/2)][Math.floor(geoJsonData['features'][featuresLenght]['geometry']['coordinates'][Math.floor(geoJsonData['features'][featuresLenght]['geometry']['coordinates'].length/2)][Math.floor(geoJsonData['features'][featuresLenght]['geometry']['coordinates'][Math.floor(geoJsonData['features'][featuresLenght]['geometry']['coordinates'].length/2)].length/2)].length/2)][0];
+      } else {
+        latLng[0] = 0;
+        latLng[1] = 0;
+      }
+    } catch (error) {
+      latLng[0] = 0;
+      latLng[1] = 0;
+      this.toastrService.danger("Could not determine center coordinates, defaulting to [0,0]", "Warning");
+      this.close();
+      this.dialogService.open(PreviewDialogComponent, {
+        context: {
+          title: this.title,
+          text: this.text,
+        },
+      })
     }
     this.map = L.map(this.geoJsonMap.nativeElement).setView(L.latLng(latLng[0], latLng[1]), 9);
 
@@ -82,14 +110,15 @@ export class GeoJsonDialogComponent {
   openMap(distribution:DCATDistribution){
     if(this.type == 'geojson'){
       if(distribution.downloadURL.includes('.zip') || distribution.downloadURL.includes('.ZIP')){
-        this.restApi.downloadZipFromUrl(distribution).subscribe(
-          (res : Blob) => {
+        this.restApi.downloadZipFromUrl(distribution).subscribe({
+          next: (res : Blob) => {
             res.arrayBuffer().then((buffer) => {
               var zip = new JSZip();
               zip.loadAsync(buffer).then((zip) => {
                 zip.forEach((relativePath, zipEntry) => {
                   zipEntry.async('string').then((content) => {
                     this.loadGeoJson(content);
+                    this.text = content;
                   }).catch((err) => {
                     console.log(err);
                     this.toastrService.danger("Could not load the file", "Error");
@@ -105,26 +134,27 @@ export class GeoJsonDialogComponent {
               this.toastrService.danger("Could not load the file", "Error");
             });
           },
-          err => {
+          error: err => {
             console.log(err);
             this.toastrService.danger("Could not load the file", "Error");
           }
-        )
+        })
       } else{
-        this.restApi.downloadGeoJSONFromUrl(distribution).subscribe(
-          (res : string) => {
-            console.log(res);
+        this.restApi.downloadGeoJSONFromUrl(distribution).subscribe({
+          next: (res : string) => {
+            // console.log(res);
             this.loadGeoJson(JSON.stringify(res))
+            this.text = res;
           },
-          err => {
+          error: err => {
             this.toastrService.danger("Could not load the GeoJSON file", "Error");
           }
-        )
+        })
       }
     } else if(this.type == 'kml') {
       if(distribution.downloadURL.includes('.zip') || distribution.downloadURL.includes('.ZIP')){
-        this.restApi.downloadZipFromUrl(distribution).subscribe(
-          (res : Blob) => {
+        this.restApi.downloadZipFromUrl(distribution).subscribe({
+          next: (res : Blob) => {
             res.arrayBuffer().then((buffer) => {
               var zip = new JSZip();
               zip.loadAsync(buffer).then((zip) => {
@@ -133,6 +163,7 @@ export class GeoJsonDialogComponent {
                     var kml = new DOMParser().parseFromString(content, 'text/xml');
                     let data = toGeoJson.kml(kml);
                     this.loadGeoJson(JSON.stringify(data));
+                    this.text = JSON.stringify(data);
                   }).catch((err) => {
                     console.log(err);
                     this.toastrService.danger("Could not load the file", "Error");
@@ -147,29 +178,30 @@ export class GeoJsonDialogComponent {
               this.toastrService.danger("Could not load the file", "Error");
             });
           },
-          err => {
+          error: err => {
             console.log(err);
             this.toastrService.danger("Could not load the file", "Error");
           }
-        )
+        })
       } else{
-        this.restApi.downloadKMLFromUrl(distribution).subscribe(
-          (res : string) => {
-            console.log(res);
+        this.restApi.downloadKMLFromUrl(distribution).subscribe({
+          next: (res : string) => {
+            // console.log(res);
             var kml = new DOMParser().parseFromString(res, 'text/xml');
             let data = toGeoJson.kml(kml);
             this.loadGeoJson(JSON.stringify(data))
+            this.text = JSON.stringify(data);
           },
-          err => {
+          error: err => {
             this.toastrService.danger("Could not load the file", "Error");
           }
-        )
+        })
       }
     } else if(this.type == 'shp'){
       if(distribution.downloadURL.includes('.zip') || distribution.downloadURL.includes('.ZIP')){
 
-        this.restApi.downloadZipFromUrl(distribution).subscribe(
-          (res : Blob) => {
+        this.restApi.downloadZipFromUrl(distribution).subscribe({
+          next: (res : Blob) => {
         
             res.arrayBuffer().then((arrayBufferData) => {
               JSZip.loadAsync(arrayBufferData).then((z) => {
@@ -246,31 +278,40 @@ export class GeoJsonDialogComponent {
                       return
                     }
                     features = await this.extractAndDecodeShapefiles(res);
+                    this.text = JSON.stringify(features);
                     this.loadShapeFile(features);
                     return
                   }
-        
-        
+      
+                  this.text = JSON.stringify(features);
                   this.loadShapeFile(features.features);
                 });
               });
             });
           },
-          err => {
+          error: err => {
             console.log(err);
             this.toastrService.danger("Could not load the file", "Error");
           }
-        )
+        })
       }
     } else {
       this.toastrService.danger("Format not valid", "Error");
+      
+      this.close();
+      this.dialogService.open(PreviewDialogComponent, {
+        context: {
+          title: this.title,
+          text: this.text,
+        },
+      })
     }
   }
 
   public loadShapeFile(file: any) {
 
     const geoJsonArray = file;
-    console.log('Response Shape File: ' + geoJsonArray);
+    // console.log('Response Shape File: ' + geoJsonArray);
 
     if (this.map) {
       this.map.remove();
@@ -279,25 +320,41 @@ export class GeoJsonDialogComponent {
     const geoJsonData = geoJsonArray[0];
     globalThis.file_content = geoJsonArray[0];
 
-    console.log("DATA");
-    console.log(geoJsonData);
+    // console.log("DATA");
+    // console.log(geoJsonData);
 
     // Creazione mappa Leaflet
     let latLng = [0, 0];
     // let featuresLenght = Math.floor(geoJsonData['features'].length/2);
 
-    if(typeof geoJsonData['geometry']['coordinates'][0] == 'number'){
-      latLng[0] += geoJsonData['geometry']['coordinates'][1];
-      latLng[1] += geoJsonData['geometry']['coordinates'][0];
-    } else if(typeof geoJsonData['geometry']['coordinates'][0][0] == 'number'){
-      latLng[0] += geoJsonData['geometry']['coordinates'][Math.floor(geoJsonData['geometry']['coordinates'].length/2)][1];
-      latLng[1] += geoJsonData['geometry']['coordinates'][Math.floor(geoJsonData['geometry']['coordinates'].length/2)][0];
-    } else if(typeof geoJsonData['geometry']['coordinates'][0][0][0] == 'number'){
-      latLng[0] += geoJsonData['geometry']['coordinates'][Math.floor(geoJsonData['geometry']['coordinates'].length/2)][Math.floor(geoJsonData['geometry']['coordinates'][Math.floor(geoJsonData['geometry']['coordinates'].length/2)].length/2)][1];
-      latLng[1] += geoJsonData['geometry']['coordinates'][Math.floor(geoJsonData['geometry']['coordinates'].length/2)][Math.floor(geoJsonData['geometry']['coordinates'][Math.floor(geoJsonData['geometry']['coordinates'].length/2)].length/2)][0];
-    } else if(typeof geoJsonData['geometry']['coordinates'][0][0][0][0] == 'number'){
-      latLng[0] += geoJsonData['geometry']['coordinates'][Math.floor(geoJsonData['geometry']['coordinates'].length/2)][Math.floor(geoJsonData['geometry']['coordinates'][Math.floor(geoJsonData['geometry']['coordinates'].length/2)].length/2)][Math.floor(geoJsonData['geometry']['coordinates'][Math.floor(geoJsonData['geometry']['coordinates'].length/2)][Math.floor(geoJsonData['geometry']['coordinates'][Math.floor(geoJsonData['geometry']['coordinates'].length/2)].length/2)].length/2)][1];
-      latLng[1] += geoJsonData['geometry']['coordinates'][Math.floor(geoJsonData['geometry']['coordinates'].length/2)][Math.floor(geoJsonData['geometry']['coordinates'][Math.floor(geoJsonData['geometry']['coordinates'].length/2)].length/2)][Math.floor(geoJsonData['geometry']['coordinates'][Math.floor(geoJsonData['geometry']['coordinates'].length/2)][Math.floor(geoJsonData['geometry']['coordinates'][Math.floor(geoJsonData['geometry']['coordinates'].length/2)].length/2)].length/2)][0];
+    try {
+      if(typeof geoJsonData['geometry']['coordinates'][0] == 'number'){
+        latLng[0] += geoJsonData['geometry']['coordinates'][1];
+        latLng[1] += geoJsonData['geometry']['coordinates'][0];
+      } else if(typeof geoJsonData['geometry']['coordinates'][0][0] == 'number'){
+        latLng[0] += geoJsonData['geometry']['coordinates'][Math.floor(geoJsonData['geometry']['coordinates'].length/2)][1];
+        latLng[1] += geoJsonData['geometry']['coordinates'][Math.floor(geoJsonData['geometry']['coordinates'].length/2)][0];
+      } else if(typeof geoJsonData['geometry']['coordinates'][0][0][0] == 'number'){
+        latLng[0] += geoJsonData['geometry']['coordinates'][Math.floor(geoJsonData['geometry']['coordinates'].length/2)][Math.floor(geoJsonData['geometry']['coordinates'][Math.floor(geoJsonData['geometry']['coordinates'].length/2)].length/2)][1];
+        latLng[1] += geoJsonData['geometry']['coordinates'][Math.floor(geoJsonData['geometry']['coordinates'].length/2)][Math.floor(geoJsonData['geometry']['coordinates'][Math.floor(geoJsonData['geometry']['coordinates'].length/2)].length/2)][0];
+      } else if(typeof geoJsonData['geometry']['coordinates'][0][0][0][0] == 'number'){
+        latLng[0] += geoJsonData['geometry']['coordinates'][Math.floor(geoJsonData['geometry']['coordinates'].length/2)][Math.floor(geoJsonData['geometry']['coordinates'][Math.floor(geoJsonData['geometry']['coordinates'].length/2)].length/2)][Math.floor(geoJsonData['geometry']['coordinates'][Math.floor(geoJsonData['geometry']['coordinates'].length/2)][Math.floor(geoJsonData['geometry']['coordinates'][Math.floor(geoJsonData['geometry']['coordinates'].length/2)].length/2)].length/2)][1];
+        latLng[1] += geoJsonData['geometry']['coordinates'][Math.floor(geoJsonData['geometry']['coordinates'].length/2)][Math.floor(geoJsonData['geometry']['coordinates'][Math.floor(geoJsonData['geometry']['coordinates'].length/2)].length/2)][Math.floor(geoJsonData['geometry']['coordinates'][Math.floor(geoJsonData['geometry']['coordinates'].length/2)][Math.floor(geoJsonData['geometry']['coordinates'][Math.floor(geoJsonData['geometry']['coordinates'].length/2)].length/2)].length/2)][0];
+      } else {
+        latLng[0] = 0;
+        latLng[1] = 0;
+      }
+    } catch (error) {
+      latLng[0] = 0;
+      latLng[1] = 0;
+      this.toastrService.danger("Could not determine center coordinates, defaulting to [0,0]", "Warning");
+      this.close();
+      this.dialogService.open(PreviewDialogComponent, {
+        context: {
+          title: this.title,
+          text: this.text,
+        },
+      })
     }
     
     this.map = L.map(this.geoJsonMap.nativeElement).setView(L.latLng(latLng[0], latLng[1]), 9);
@@ -336,7 +393,7 @@ export class GeoJsonDialogComponent {
     // does this feature have a property named popupContent?
     if (feature.properties) {
       // map json properties to popup
-      let popupContent = "<p>";
+      let popupContent = "<p style='color: black !important;'>";
       for (const key in feature.properties) {
         popupContent += "- "+ key + ": " + feature.properties[key] + "<br>";
       }
@@ -361,7 +418,7 @@ export class GeoJsonDialogComponent {
           const lastDotPRJ = fileName.lastIndexOf('.');
           prjFileName = fileName.slice(0, lastDotPRJ);
           prjFileContent = await zipContent.files[fileName].async('arraybuffer');
-          console.log("creato file prj" + fileName);
+          // console.log("creato file prj" + fileName);
         }
         if (fileName.endsWith('.shp') || fileName.endsWith('.shx')) {
           const shpFileContent = await zipContent.files[fileName].async('arraybuffer');
@@ -375,18 +432,18 @@ export class GeoJsonDialogComponent {
             const geoJson = await shp.parseShp(shpFileContent);
             geoJsonArray.push(geoJson);
           }
-          console.log("aggiunto file shp" + fileName);
+          // console.log("aggiunto file shp" + fileName);
         } else if (fileName.endsWith('.dbf')) {
           const dbfFileContent = await zipContent.files[fileName].async('arraybuffer');
           const geoJson = await shp.parseDbf(dbfFileContent);
-          console.log("aggiunto file dbf" + fileName);
+          // console.log("aggiunto file dbf" + fileName);
           geoJsonArray.push(geoJson);
         }
       } catch (error) {
         console.log("error: " + fileName + ": " + error);
       }
     }));
-    console.log("raggiunto fine file")
+    // console.log("raggiunto fine file")
 
     return geoJsonArray;
   }

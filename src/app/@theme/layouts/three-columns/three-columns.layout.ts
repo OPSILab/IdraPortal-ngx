@@ -1,6 +1,9 @@
 import { Component } from '@angular/core';
+import { NbLayoutModule, NbSidebarModule } from '@nebular/theme';
+import { FooterComponent, HeaderComponent } from '../../components';
 
 @Component({
+  imports: [NbLayoutModule, NbSidebarModule, HeaderComponent, FooterComponent],
   selector: 'ngx-three-columns-layout',
   styleUrls: ['./three-columns.layout.scss'],
   template: `

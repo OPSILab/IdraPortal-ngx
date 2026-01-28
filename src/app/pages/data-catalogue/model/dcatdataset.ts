@@ -1,8 +1,10 @@
+import { DcatDatasetSeries } from "./dcatdatasetseries";
 import { DCATDistribution } from "./dcatdistribution";
 import { DCTLocation } from "./dctlocation";
 import { DCTPeriodOfTime } from "./dctperiod-of-time";
 import { DCTStandard } from "./dctstandard";
 import { FOAFAgent } from "./foafagent";
+import { Relationship } from "./relationship";
 import { SKOSConcept } from "./skosconcept";
 import { VCardOrganization } from "./vcard-organization";
 
@@ -48,5 +50,11 @@ export class DCATDataset {
   legacyIdentifier?: string;
   distributionFormats?: Array<FormatCount>=[];
   versionNotes?:string[];
+  applicableLegislation?: String[]; //
+  inSeries?: DcatDatasetSeries[];
+  qualifiedRelation?: Relationship[];
+  temporalResolution?: String;
+  wasGeneratedBy?: String[];
+  HVDCategory?: String[];
   constructor(){}
 }

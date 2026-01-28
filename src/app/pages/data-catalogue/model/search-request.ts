@@ -13,6 +13,7 @@ export class SearchRequest {
   rows: number=20;
   start: number=0;
   nodes?: number[]=[];
+  hasHvdCategory?: boolean;
 
   constructor(){}
 }

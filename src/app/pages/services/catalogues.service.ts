@@ -28,14 +28,17 @@ export class CataloguesService {
           'Access-Control-Allow-Methods': 'GET',
         },
       },)
-      .subscribe((data: any) => {
-        resolve(data)
-        return data
-      }, error => {
-        const toastRef: NbToastRef = this.toastr.show("There was an error", 'Error', { status: 'danger', duration: 3000, destroyByClick: true, position: NbGlobalPhysicalPosition.TOP_RIGHT});
-        
-        reject(error)
-        return error
+      .subscribe({
+        next: (data: any) => {
+          resolve(data)
+          return data
+        },
+          error: error => {
+          const toastRef: NbToastRef = this.toastr.show("There was an error", 'Error', { status: 'danger', duration: 3000, destroyByClick: true, position: NbGlobalPhysicalPosition.TOP_RIGHT});
+          
+          reject(error)
+          return error
+      }
       })
     })
   }

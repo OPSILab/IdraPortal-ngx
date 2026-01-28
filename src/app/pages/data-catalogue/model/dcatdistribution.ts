@@ -2,6 +2,7 @@ import { DCTLicenseDocument } from "./dctlicense-document";
 import { DCTStandard } from "./dctstandard";
 import { SKOSConcept } from "./skosconcept";
 import { SPDXChecksum } from "./spdxchecksum";
+import { DcatDataService } from "./dcatdataservice";
 
 export class DCATDistribution {
   id: string;
@@ -24,6 +25,14 @@ export class DCATDistribution {
   status?: SKOSConcept;
   title?: string;
   hasDatalets?: boolean;
+  accessService?: DcatDataService[];
+  applicableLegislation?: String[];
+  availability?: String;
+  compressionFormat?: String;
+  hasPolicy?: String;
+  packagingFormat?: String;
+  spatialResolution?: String;
+  temporalResolution?: String;
 
-  constructor(){}
+  constructor() {}
 }

@@ -24,7 +24,7 @@
                       type="file" 
                       class="form-control" 
                       multiple 
-                      formControlName="importFile" 
+                      [formControl]="formImport.controls['importFile']" 
                       id="importFile" 
                       (change)="onFileChange($event.target.files)"
                     >
@@ -55,8 +55,8 @@
           </div>
           <nb-card>
       <nb-card-body class="scrollable-card">
-        <label class="search-label" for="search_list">{{ 'SEARCH' | translate }}:</label>
-                <input fieldSize="small" nbInput [nbFilterInput]="dataSource" id="search" class="search-input">
+  <label class="search-label" for="search_list">{{ 'SEARCH' | translate }}:</label>
+    <input fieldSize="small" nbInput [nbFilterInput]="dataSource_list" id="search_list" class="search-input">
                 <button size="small" class="ml-2" nbButton (click)="loadList()"><nb-icon icon="refresh-outline"></nb-icon></button>
         <table [nbTreeGrid]="dataSource_list" [nbSort]="dataSource_list" (sort)="updateSort($event)">
                   <tr nbTreeGridHeaderRow *nbTreeGridHeaderRowDef="allColumns_list"></tr>
@@ -71,21 +71,20 @@
               {{ row.data[customColumn_list] }}
                     </td>
                   </ng-container>
-          <ng-container *ngFor="let column of defaultColumns_list; let index = index" [nbTreeGridColumnDef]="column" [showOn]="getShowOn(index)">
+          @for (column of defaultColumns_list; track $index) {<ng-container [nbTreeGridColumnDef]="column" [showOn]="getShowOn($index)">
                     <th nbTreeGridHeaderCell [nbSortHeader]="getSortDirection(column)" *nbTreeGridHeaderCellDef>
               {{ column }}
                     </th>
             <td nbTreeGridCell *nbTreeGridCellDef="let row">
                       <div class="buttonContainer">
-                <div *ngIf="column !== 'Action'; else isLastColumn">{{ row.data[column] || '-' }}</div>
-                        <ng-template #isLastColumn>
+                @if (column !== 'Action') {<div>{{ row.data[column] || '-' }}</div>} @else {<ng-container>
                   <button size="small" outline nbButton status="primary" [hidden]="row.data['Type'] == 'dataset'" (click)="getCatalogue(row.data['Action'])">{{ 'MQA_SHOW_SCORE' | translate }}</button>
                   <button size="small" outline nbButton status="primary" [hidden]="row.data['Type'] == 'catalogue'" (click)="getDataset(row.data['Action'])">{{ 'MQA_SHOW_METRICS' | translate }}</button>
-                          <button size="small" outline nbButton status="danger" (click)="alertConfirm(row.data['Action'])"><nb-icon icon="trash-2-outline"></nb-icon></button>
-                        </ng-template>
+                  <button size="small" outline nbButton status="danger" (click)="alertConfirm(row.data['Action'])"><nb-icon icon="trash-2-outline"></nb-icon></button>
+                </ng-container>}
                       </div>
                     </td>
-                  </ng-container>
+                  </ng-container>}
             
                 </table>
             
@@ -93,7 +92,7 @@
             </nb-card>
             
       </div>
-      <div class="col-12" *ngIf="data.length != 0">
+  @if (data.length != 0) {<div class="col-12">
         <!-- <div class="row justify-content-center align-items-center">
           <h4>Type: <span id="response-type">-</span></h4>
         </div> -->
@@ -102,21 +101,21 @@
                   <div echarts [options]="option" class="echart"></div>
               </div>
               <div class="info col-6">
-        <div class="h4 value">{{ 'MQA_OVERALL_SCORE' | translate }}: <span id="overall">0</span></div>
+  <div class="h4 value">{{ 'MQA_OVERALL_SCORE' | translate }}: <span id="overall">{{ overallScore }}</span></div>
         <div class="details subtitle-2"><span>{{ 'MQA_OUT_OF' | translate }}</span> 405</div>
               </div>
           </div>
-      </div>
+  </div>}
     </div>
     <div class="row justify-content-center align-items-center">
-  <div class="col-12" *ngIf="data.length != 0">
+  @if (data.length != 0) {<div class="col-12">
         <div class="row align-items-center ml-1">
       <h5>{{ 'MQA_CATALOGUE_SCORE' | translate }}</h5>
         </div>
         <nb-card>
             <nb-card-body>
-        <label class="search-label" for="search">{{ 'MQA_SEARCH' | translate }}:</label>
-							<input fieldSize="small" nbInput [nbFilterInput]="dataSource" id="search" class="search-input">
+  <label class="search-label" for="search_catalogue">{{ 'SEARCH' | translate }}:</label>
+          <input fieldSize="small" nbInput [nbFilterInput]="dataSource" id="search_catalogue" class="search-input">
           
               <table [nbTreeGrid]="dataSource" [nbSort]="dataSource" (sort)="updateSort($event)">
           
@@ -132,27 +131,27 @@
               {{ row.data[customColumn] }}
                   </td>
                 </ng-container>
-          <ng-container *ngFor="let column of defaultColumns; let index = index" [nbTreeGridColumnDef]="column" [showOn]="getShowOn(index)">
+      @for (column of defaultColumns; track $index) {<ng-container [nbTreeGridColumnDef]="column" [showOn]="getShowOn($index)">
                   <th nbTreeGridHeaderCell [nbSortHeader]="getSortDirection(column)" *nbTreeGridHeaderCellDef>
               {{ column }}
                   </th>
             <td nbTreeGridCell *nbTreeGridCellDef="let row">{{ row.data[column] || '-' }}</td>
-                </ng-container>
+        </ng-container>}
           
               </table>
           
             </nb-card-body>
           </nb-card>
           
-      </div>
-      <div class="col-12" *ngIf="data_dat.length != 0">
+  </div>}
+  @if (data_dat.length != 0) {<div class="col-12">
         <div class="row align-items-center ml-1">
       <h5>{{ 'MQA_DATASET_METRICS' | translate }}</h5>
         </div>
         <nb-card>
             <nb-card-body>
-        <label class="search-label" for="search">{{ 'MQA_SEARCH' | translate }}:</label>
-							<input fieldSize="small" nbInput [nbFilterInput]="dataSource" id="search" class="search-input">
+  <label class="search-label" for="search_dataset">{{ 'SEARCH' | translate }}:</label>
+          <input fieldSize="small" nbInput [nbFilterInput]="dataSource_dat" id="search_dataset" class="search-input">
           
               <table [nbTreeGrid]="dataSource_dat" [nbSort]="dataSource_dat" (sort)="updateSort($event)">
           
@@ -168,29 +167,24 @@
                     {{ row.data[customColumn_dat] }}
                   </td>
                 </ng-container>
-                <ng-container *ngFor="let column of defaultColumns_dat_indexes; let index = index" [nbTreeGridColumnDef]="column" [showOn]="getShowOn(index)">
+                @for (column of defaultColumns_dat_indexes; track $index) {<ng-container [nbTreeGridColumnDef]="column" [showOn]="getShowOn($index)">
                   <th nbTreeGridHeaderCell [nbSortHeader]="getSortDirection(column)" *nbTreeGridHeaderCellDef>
-                    {{ defaultColumns_dat[index] }} 
-                    <nb-icon class="ml-icon" *ngIf="index == 0" nbTooltip="{{ 'MQA_DATASET_TABLE_INFO_TOOLTIP_VALUE' | translate }}" icon="info" [options]="{ animation: { type: 'zoom' } }"></nb-icon>
-                    <nb-icon class="ml-icon" *ngIf="index == 0" nbTooltip="{{ 'MQA_DATASET_TABLE_INFO_TOOLTIP_VALUE' | translate }}" icon="info" [options]="{ animation: { type: 'zoom' } }"></nb-icon>
+                    {{ defaultColumns_dat[$index] }} 
+                    @if ($index == 0) {<nb-icon class="ml-icon" nbTooltip="{{ 'MQA_DATASET_TABLE_INFO_TOOLTIP_VALUE' | translate }}" icon="info" [options]="{ animation: { type: 'zoom' } }"></nb-icon>}
                   </th>
                   
                   <td nbTreeGridCell *nbTreeGridCellDef="let row">
-                    <div *ngIf="index == 0 && row.data[column] !== 'true' && row.data[column] !== 'false' && row.data[column]!=='-' && !row.data[column].startsWith('code:') ;then content else rowColumnStandard"></div>
-                    <ng-template #content>
-                      <span [ngClass]="{'text-danger': row.data[column] > 100}">{{ row.data[column] }}%</span>
-                    </ng-template>    
-                    <ng-template #rowColumnStandard>{{ row.data[column] }}</ng-template>
+                    @if ($index == 0 && row.data[column] !== 'true' && row.data[column] !== 'false' && row.data[column]!=='-' && !row.data[column].startsWith('code:')) {<span [ngClass]="{'text-danger': row.data[column] > 100}">{{ row.data[column] }}%</span>} @else {<ng-container>{{ row.data[column] }}</ng-container>}
                     
                   </td>
-                </ng-container>
+                </ng-container>}
           
               </table>
           
             </nb-card-body>
           </nb-card>
           
-      </div>
+  </div>}
     </div>
    <br>
    <hr>

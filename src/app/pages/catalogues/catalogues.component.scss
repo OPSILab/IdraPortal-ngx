@@ -33,10 +33,36 @@
 ::ng-deep nb-layout-column {
   padding: 0;
   margin: 0 auto; 
-  background-color: #e9ecef;
+  /* Use theme variable so dark mode applies correctly */
+  // background-color: var(--background-basic-color-1);
   border-radius: .3rem;
   width: 100%;
   box-sizing: border-box; 
+}
+
+::ng-deep nb-card {
+  background-color: var(--card-background-color); 
+}
+
+/* Statistics page uses Bootstrap-like .card markup; ensure it follows the active Nebular theme */
+:host ::ng-deep .card {
+    background-color: var(--card-background-color) !important;
+    color: var(--text-basic-color) !important;
+    border-color: var(--border-basic-color-3) !important;
+}
+
+:host ::ng-deep .card-header,
+:host ::ng-deep .card-body {
+    background-color: var(--card-background-color) !important;
+    color: var(--text-basic-color) !important;
+}
+
+:host ::ng-deep .card-header {
+    border-bottom-color: var(--border-basic-color-3) !important;
+}
+
+:host ::ng-deep .card-title {
+    color: var(--text-basic-color) !important;
 }
 .jumbotron {
   padding: 0;

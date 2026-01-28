@@ -2,7 +2,7 @@ import { RouterModule, Routes } from '@angular/router';
 import { NgModule } from '@angular/core';
 
 import { PagesComponent } from './pages.component';
-import { NotFoundComponent } from './miscellaneous/not-found/not-found.component';
+import { NotFoundComponent } from './not-found/not-found.component';
 import {
   NbAuthComponent as NebularAuthComponent,
   NbLoginComponent as NebularLoginComponent,
@@ -17,30 +17,24 @@ const routes: Routes = [{
   children: [
     {
       path: 'home',
-      loadChildren: () => import('./home/home.module')
-        .then(m => m.HomeModule),
+      loadComponent: () => import('./home/home.component')
+        .then(m => m.HomeComponent),
     },
     {
       path: 'sparql',
-      loadChildren: () => import('./sparql/sparql.module')
-      .then(m => m.SparqlModule),
-    },
-    {
-      path: 'about',
-      loadChildren: () => import('./about/about.module')
-        .then(m => m.AboutModule),
+      loadComponent: () => import('./sparql/sparql.component')
+      .then(m => m.SparqlComponent),
     },
     {
       path: 'catalogues',
-      loadChildren: () => import('./catalogues/catalogues.module')
-      .then(m => m.CataloguesModule),
+      loadComponent: () => import('./catalogues/catalogues.component')
+      .then(m => m.CataloguesComponent),
     },
     {
       path: 'datasets',
       loadChildren: () => import('./data-catalogue/data-catalogue.module')
         .then(m => m.DataCatalogueModule),
     },
-//-------------------- NEW
      {
       path: 'administration',
       loadChildren: () => import('./admin/admin-module.module')
@@ -48,13 +42,13 @@ const routes: Routes = [{
     },
     {
       path: 'mqa',
-      loadChildren: () => import('./mqa/mqa.module')
-      .then(m => m.MqaModule),
+      loadComponent: () => import('./mqa/mqa.component')
+      .then(m => m.MqaComponent),
     },
     {
       path: 'statistics',
-      loadChildren: () => import('./statistics/statistics.module')
-      .then(m => m.StatisticsModule),
+      loadComponent: () => import('./statistics/statistics.component')
+      .then(m => m.StatisticsComponent),
     },
     {
       path: 'keycloak-auth',
@@ -81,11 +75,8 @@ const routes: Routes = [{
             {
               path: 'logout',
               component: NbLogoutComponent,
-            },
+            }
           ]},
-    
-    
-// ---------------------
     { 
       path: '',
       redirectTo: 'home',

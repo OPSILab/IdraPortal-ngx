@@ -5,7 +5,7 @@
         <div class="flex-centered col-xl-4 col-lg-6 col-md-8 col-sm-12">
           <h2 class="title">{{ 'NOT_FOUND_TITLE' | translate }}</h2>
           <small class="sub-title">{{ 'NOT_FOUND_SUB_TITLE' | translate }}</small>
-          <button nbButton matRipple fullWidth (click)="goToHome()" type="button" class="home-button">
+          <button nbButton routerLink="/pages/home" fullWidth type="button" class="home-button">
             {{ 'NOT_FOUND_BUTTON' | translate }}
           </button>
         </div>

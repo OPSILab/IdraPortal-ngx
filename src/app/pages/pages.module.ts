@@ -4,7 +4,6 @@ import { TranslateModule } from '@ngx-translate/core';
 import { ThemeModule } from '../@theme/theme.module';
 import { PagesComponent } from './pages.component';
 import { PagesRoutingModule } from './pages-routing.module';
-import { MiscellaneousModule } from './miscellaneous/miscellaneous.module';
 import { CUSTOM_ELEMENTS_SCHEMA,NO_ERRORS_SCHEMA } from '@angular/core';
 @NgModule({
   schemas: [CUSTOM_ELEMENTS_SCHEMA,NO_ERRORS_SCHEMA],
@@ -12,11 +11,11 @@ import { CUSTOM_ELEMENTS_SCHEMA,NO_ERRORS_SCHEMA } from '@angular/core';
     PagesRoutingModule,
     ThemeModule,
     NbMenuModule,
-    MiscellaneousModule,
-    TranslateModule
+    TranslateModule,
+    PagesComponent
   ],
   declarations: [
-    PagesComponent
+    
   ],
 })
 export class PagesModule {

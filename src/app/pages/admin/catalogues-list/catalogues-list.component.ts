@@ -1,17 +1,18 @@
 import { Component, OnInit } from '@angular/core';
-import { NbDialogService, NbSortDirection, NbSortRequest, NbTreeGridDataSource, NbTreeGridDataSourceBuilder } from '@nebular/theme';
-import { CataloguesServiceService } from '../catalogues-service.service';
+import { NbDialogService, NbIconModule, NbInputModule, NbSortDirection, NbSortRequest, NbToggleModule, NbTooltipModule, NbTreeGridDataSource, NbTreeGridDataSourceBuilder, NbTreeGridModule } from '@nebular/theme';
+import { CataloguesServiceService } from '../../services/catalogues-service.service';
 import { ODMSCatalogue } from '../../data-catalogue/model/odmscatalogue';
 
 import { Output, EventEmitter} from '@angular/core';
-import {formatDate } from '@angular/common';
+import {CommonModule, formatDate } from '@angular/common';
 import { ShowcaseDialogComponent } from './dialog/showcase-dialog/showcase-dialog.component';
-import { Router } from '@angular/router';
+import { Router, RouterModule } from '@angular/router';
 import { SharedService } from '../../services/shared.service';
 import { ODMSCatalogueComplete } from '../../data-catalogue/model/odmscataloguecomplete';
-import { RefreshService } from '../../services/refresh.service';
 import { TranslateService } from '@ngx-translate/core';
 import { ConfigService } from 'ngx-config-json';
+import { NbCardModule } from '@nebular/theme';
+import { TranslateModule } from '@ngx-translate/core';
 
 
 interface TreeNode<T> {
@@ -40,6 +41,7 @@ interface FSEntry {
 
 
 @Component({
+  imports: [NbCardModule, TranslateModule, NbTreeGridModule, NbInputModule, NbToggleModule, NbIconModule, NbTooltipModule, RouterModule, CommonModule],
   selector: 'ngx-catalogues-list',
   templateUrl: './catalogues-list.component.html',
   styleUrls: ['./catalogues-list.component.scss']
@@ -317,105 +319,148 @@ export class CataloguesListComponent implements OnInit {
 		private router: Router,
 		public translation: TranslateService,
 		private sharedService: SharedService,
-		private refreshService: RefreshService,
 		private config:ConfigService<Record<string, any>>
 	  ) {
-		this.CB_enabled=this.config.config["idra.orion.manager.url"];
+		// Ensure CB_enabled is a real boolean (config value may be a string URL)
+		this.CB_enabled = !!this.config.config["idra.orion.manager.url"];
+		// Initialize columns immediately to avoid header/cell template mismatches on first render
+		if (this.CB_enabled) {
+			this.defaultColumns = [ 'Name', 'Country', 'Type', 'Level', 'Status', 'Datasets', 'UpdatePeriod', 'LastUpdate', 'id', 'CB'];
+		} else {
+			this.defaultColumns = [ 'Name', 'Country', 'Type', 'Level', 'Status', 'Datasets', 'UpdatePeriod', 'LastUpdate', 'id'];
+		}
+		this.allColumns = [ this.customColumn, ...this.defaultColumns, this.iconColumn ];
 	}
 
 	ngOnInit(): void {
-		this.refreshService.refreshPageOnce('admin-configuration');
-
 		this.loadCatalogue();
 		setInterval(() => {
 			this.loadCatalogue();
 		}, 60000);
 	}
 
-	CB_enabled = true;
+	CB_enabled: boolean = true;
 	loadCatalogue(){
 		this.data = [];
 		// this.dataSource = this.dataSourceBuilder.create(this.data);
 		this.loading=true
 		if(this.CB_enabled){
 			this.defaultColumns = [ 'Name', 'Country', 'Type', 'Level', 'Status', 'Datasets', 'UpdatePeriod', 'LastUpdate', 'id', 'CB'];
-			this.allColumns = [ this.customColumn, ...this.defaultColumns, ...this.iconColumn ];
+			this.allColumns = [ this.customColumn, ...this.defaultColumns, this.iconColumn ];
 		} else {
 			this.defaultColumns = [ 'Name', 'Country', 'Type', 'Level', 'Status', 'Datasets', 'UpdatePeriod', 'LastUpdate', 'id'];
+			this.allColumns = [ this.customColumn, ...this.defaultColumns, this.iconColumn ];
 		}
 
-		this.restApi.getAllCataloguesInfo().subscribe(infos =>{
-			this.allColumns = [ this.customColumn, ...this.defaultColumns, ...this.iconColumn ];
-			this.cataloguesInfos = infos;
-			console.log("cataloguesInfos: ",this.cataloguesInfos)
-			this.totalCatalogues = this.cataloguesInfos.length;
-			for(let i=0; i<infos.length; i++){
-				// make an if to check if name is readable to avoid errors
-				try {
+		this.restApi.getAllCataloguesInfo().subscribe({
+			next: (infos) => {
+				this.allColumns = [ this.customColumn, ...this.defaultColumns, this.iconColumn ];
+				this.cataloguesInfos = infos;
+				this.totalCatalogues = this.cataloguesInfos.length;
+				this.data = [];
 
-						// 	push to this.data the info of the catalogues
-						let level = this.getLevel(infos[i].nodeType);
-						let refreshPeriodValue = parseInt(infos[i].refreshPeriod);
-						let refreshPeriod = "";
-						switch(refreshPeriodValue){
+				for (let i = 0; i < infos.length; i++) {
+					const info = infos[i];
+					try {
+						const level = this.getLevel(info.nodeType);
+						const refreshPeriodValue = parseInt((info.refreshPeriod ?? '').toString(), 10);
+						let refreshPeriod = '';
+						switch (refreshPeriodValue) {
 							case 0:
-								refreshPeriod = "Auto-update";
+								refreshPeriod = 'Auto-update';
 								break;
 							case 1:
-								refreshPeriod = "-";
+								refreshPeriod = '-';
 								break;
-							case 3600: 
-								refreshPeriod = "1 hour";
+							case 3600:
+								refreshPeriod = '1 hour';
 								break;
 							case 86400:
-								refreshPeriod = "1 day";
+								refreshPeriod = '1 day';
 								break;
 							case 604800:
-								refreshPeriod = "1 week";
+								refreshPeriod = '1 week';
 								break;
+							default:
+								refreshPeriod = '-';
 						}
-						let country = this.countries.find(c => c.code == infos[i].country);
-	
+
+						const countryCode = info.country ?? 'IT';
+						const countryObj = this.countries.find(c => c.code === countryCode) ?? { name: countryCode };
+
 						this.data.push({
-							data: { Name: infos[i].name, Country: country.name, Type: infos[i].nodeType, Level: level, Status: infos[i].nodeState, CB: infos[i].isFederatedInCb, Datasets: infos[i].datasetCount, UpdatePeriod: refreshPeriod, LastUpdate: formatDate(infos[i].lastUpdateDate, 'yyyy-MM-dd HH:mm:ss', 'en-US'), id: infos[i].id, index: i, Active: infos[i].isActive, synchLock: infos[i].synchLock, catalogueUrl: infos[i].homepage},
+							data: {
+								Name: info.name,
+								Country: countryObj.name,
+								Type: info.nodeType,
+								Level: level,
+								Status: info.nodeState,
+								CB: info.isFederatedInCb,
+								Datasets: info.datasetCount,
+								UpdatePeriod: refreshPeriod,
+								LastUpdate: formatDate(info.lastUpdateDate, 'yyyy-MM-dd HH:mm:ss', 'en-US'),
+								id: info.id,
+								index: i,
+								Active: info.isActive,
+								synchLock: info.synchLock,
+								catalogueUrl: info.homepage
+							}
 						});
-						this.dataSource = this.dataSourceBuilder.create(this.data);
-				} catch (error) {
-					// skip
-						infos[i].country = "IT";
-						// 	push to this.data the info of the catalogues
-						let level = this.getLevel(infos[i].nodeType);
-						let refreshPeriodValue = parseInt(infos[i].refreshPeriod);
-						let refreshPeriod = "";
-						switch(refreshPeriodValue){
+					} catch (error) {
+						// fallback: ensure minimal sane values and continue
+						const fallback = infos[i];
+						const level = this.getLevel(fallback.nodeType);
+						const refreshPeriodValue = parseInt((fallback.refreshPeriod ?? '').toString(), 10);
+						let refreshPeriod = '-';
+						switch (refreshPeriodValue) {
 							case 0:
-								refreshPeriod = "Auto-update";
+								refreshPeriod = 'Auto-update';
 								break;
 							case 1:
-								refreshPeriod = "-";
+								refreshPeriod = '-';
 								break;
-							case 3600: 
-								refreshPeriod = "1 hour";
+							case 3600:
+								refreshPeriod = '1 hour';
 								break;
 							case 86400:
-								refreshPeriod = "1 day";
+								refreshPeriod = '1 day';
 								break;
 							case 604800:
-								refreshPeriod = "1 week";
+								refreshPeriod = '1 week';
 								break;
 						}
-						let country = this.countries.find(c => c.code == infos[i].country);
-	
+						const countryCode = fallback.country ?? 'IT';
+						const countryObj = this.countries.find(c => c.code === countryCode) ?? { name: countryCode };
+
 						this.data.push({
-							data: { Name: infos[i].name, Country: country.name, Type: infos[i].nodeType, Level: level, Status: infos[i].nodeState, CB: infos[i].isFederatedInCb, Datasets: infos[i].datasetCount, UpdatePeriod: refreshPeriod, LastUpdate: formatDate(infos[i].lastUpdateDate, 'yyyy-MM-dd HH:mm:ss', 'en-US'), id: infos[i].id, index: i, Active: infos[i].isActive, synchLock: infos[i].synchLock, catalogueUrl: infos[i].homepage},
+							data: {
+								Name: fallback.name ?? 'Unknown',
+								Country: countryObj.name,
+								Type: fallback.nodeType ?? 'UNKNOWN',
+								Level: level,
+								Status: fallback.nodeState ?? 'UNKNOWN',
+								CB: fallback.isFederatedInCb ?? false,
+								Datasets: fallback.datasetCount ?? 0,
+								UpdatePeriod: refreshPeriod,
+								LastUpdate: formatDate(fallback.lastUpdateDate ?? new Date(), 'yyyy-MM-dd HH:mm:ss', 'en-US'),
+								id: fallback.id ?? '',
+								index: i,
+								Active: fallback.isActive ?? false,
+								synchLock: fallback.synchLock ?? '',
+								catalogueUrl: fallback.homepage ?? ''
+							}
 						});
-						this.dataSource = this.dataSourceBuilder.create(this.data);
+					}
 				}
+
+				this.dataSource = this.dataSourceBuilder.create(this.data);
+				this.loading = false;
+			},
+			error: (err) => {
+				console.error(err);
+				this.loading = false;
 			}
-		},err=>{
-			console.log(err);
-			this.loading=false;
-		})
+		});
 	}
 
 
@@ -428,6 +473,7 @@ export class CataloguesListComponent implements OnInit {
 
 	getLevel(nodeType: string): string {
 			switch(nodeType){
+				case 'ZENODO':
 				case 'CKAN':
 					//federationLevel='LEVEL_3';
 					return "3";

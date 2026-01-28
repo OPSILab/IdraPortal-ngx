@@ -1,9 +1,13 @@
 import { Component, OnInit } from '@angular/core';
-import { NbDialogRef } from '@nebular/theme';
+import { NbButtonModule, NbCardModule, NbDialogRef, NbSelectModule } from '@nebular/theme';
 import { Datalet } from '../model/datalet';
 import { DataCataglogueAPIService } from '../services/data-cataglogue-api.service';
+import { SafeHtmlPipe } from '../../../@theme/pipes';
+import { CommonModule } from '@angular/common';
+import { TranslateModule } from '@ngx-translate/core';
 
 @Component({
+  imports: [NbCardModule, NbSelectModule, SafeHtmlPipe, CommonModule, TranslateModule, NbButtonModule],
   selector: 'ngx-show-datalets',
   templateUrl: './show-datalets.component.html',
   styleUrls: ['./show-datalets.component.scss']
@@ -23,8 +27,8 @@ export class ShowDataletsComponent implements OnInit {
     protected dialogRef: NbDialogRef<ShowDataletsComponent>, protected restApi: DataCataglogueAPIService) {}
 
   ngOnInit(): void {
-    this.restApi.getDatalets(this.nodeID,this.datasetID,this.distributionID).subscribe(
-      res => {
+    this.restApi.getDatalets(this.nodeID,this.datasetID,this.distributionID).subscribe({
+      next: (res) => {
         if(res.length==0){
           // show message that no datalets are available
           this.datalets=[];
@@ -34,8 +38,8 @@ export class ShowDataletsComponent implements OnInit {
         this.datalets=res;
         this.selected=this.datalets[0];
       },
-      err => console.log(err)
-    )
+      error: err => console.log(err)
+    });
   }
 
   close() {

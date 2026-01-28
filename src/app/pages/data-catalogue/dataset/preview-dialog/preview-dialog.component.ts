@@ -1,7 +1,9 @@
 import { Component, Input } from '@angular/core';
-import { NbDialogRef } from '@nebular/theme';
+import { NbButtonModule, NbCardModule, NbDialogRef, NbSpinnerModule } from '@nebular/theme';
+import { TranslateModule } from '@ngx-translate/core';
 
 @Component({
+  imports: [NbSpinnerModule, NbCardModule, TranslateModule, NbButtonModule],
   selector: 'ngx-remoteCatalogue-dialog',
   templateUrl: 'preview-dialog.component.html',
   styleUrls: ['preview-dialog.component.scss'],
@@ -15,18 +17,40 @@ export class PreviewDialogComponent {
 
   constructor(protected ref: NbDialogRef<PreviewDialogComponent>) {}
 
+  close() {
+    this.ref.close();
+  }
   ngOnInit() {
   const isCSV = this.url?.includes('csv');
   const isJSON = this.url?.includes('json');
 
   if (isCSV || isJSON) {
     this.loading = true;
-    fetch(this.url, {referrerPolicy: "unsafe-url" })
+    // Use a public CORS proxy for development only; replace with your backend proxy in production
+    const corsProxy = 'https://corsproxy.io/?';
+    fetch(corsProxy + encodeURIComponent(this.url), { referrerPolicy: "unsafe-url" })
       .then(response => {
-        if (!response.ok) throw new Error("Network response was not ok");
-        return response.text();
+      const contentLength = response.headers.get('content-length');
+      if (contentLength && parseInt(contentLength, 10) > 15 * 1024 * 1024) {
+        const container = document.getElementById('iframeBody');
+        if (container) {
+        container.innerHTML = '<div style="color: red; font-weight: bold; font-size: 1.2em;">{{ "PREVIEW_SIZE_TOO_LARGE" | translate }}</div>';
+        }
+        this.loading = false;
+        throw new Error("File size too large to preview, but you can still download it");
+      }
+      if (!response.ok) throw new Error("Network response was not ok");
+      return response.text();
       })
       .then(data => {
+        if (data && data.length > 20 * 1024 * 1024) {
+          const container = document.getElementById('iframeBody');
+          if (container) {
+          container.innerHTML = '<div style="color: red; font-weight: bold; font-size: 1.2em;">{{ "PREVIEW_SIZE_TOO_LARGE" | translate }}</div>';
+          }
+          this.loading = false;
+          throw new Error("File size too large to preview, but you can still download it");
+        }
         const container = document.getElementById('iframeBody');
         if (isCSV) {
           const table = this.csvToTable(data);
@@ -73,22 +97,30 @@ export class PreviewDialogComponent {
   //   this.loading = false;
   // }
   } else {
-  this.loading = true;
-  const pre = document.createElement('pre');
-  pre.setAttribute('style','height: 70vh;width: 80vw;overflow: auto;');
-  pre.setAttribute('readonly','true');
+    if (this.text && this.text.length > 15 * 1024 * 1024) {
+      const container = document.getElementById('iframeBody');
+      if (container) {
+      container.innerHTML = '<div style="color: red; font-weight: bold; font-size: 1.2em;">{{ "PREVIEW_SIZE_TOO_LARGE" | translate }}</div>';
+      }
+      this.loading = false;
+      throw new Error("File size too large to preview, but you can still download it");
+    }
+    this.loading = true;
+    const pre = document.createElement('pre');
+    pre.setAttribute('style','height: 70vh;width: 80vw;overflow: auto;');
+    pre.setAttribute('readonly','true');
 
-  try {
-    const parsed = JSON.parse(this.text);
-    pre.textContent = JSON.stringify(parsed, null, 2);
-  } catch (e) {
-    // In caso non sia JSON valido, mostra così com'è
-    pre.textContent = this.text;
+    try {
+      const parsed = JSON.parse(this.text);
+      pre.textContent = JSON.stringify(parsed, null, 2);
+    } catch (e) {
+      // In caso non sia JSON valido, mostra così com'è
+      pre.textContent = this.text;
+    }
+
+    document.getElementById('iframeBody').appendChild(pre);
+    this.loading = false;
   }
-
-  document.getElementById('iframeBody').appendChild(pre);
-  this.loading = false;
-}
 }
 
 

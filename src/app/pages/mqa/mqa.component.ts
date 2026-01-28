@@ -1,11 +1,12 @@
-import { Component, Input, OnInit, ElementRef, OnDestroy, ViewChild } from '@angular/core';
+import { Component, Input, OnInit, ElementRef, ViewChild } from '@angular/core';
+import { CommonModule } from '@angular/common';
 import { MqaService } from '../services/mqa.service';
-import { NbSortDirection, NbSortRequest, NbThemeService, NbTreeGridDataSource, NbTreeGridDataSourceBuilder } from '@nebular/theme';
+import { NbAccordionModule, NbButtonModule, NbCardModule, NbFormFieldModule, NbIconModule, NbInputModule, NbSortDirection, NbSortRequest, NbTableModule, NbThemeService, NbTooltipModule, NbTreeGridDataSource, NbTreeGridDataSourceBuilder, NbTreeGridModule, NbUserModule } from '@nebular/theme';
+import { NgxEchartsModule } from 'ngx-echarts';
 import { delay } from 'rxjs/operators';
-import {FormControl, FormGroup, Validators} from '@angular/forms';
-import { RefreshService } from '../services/refresh.service';
+import {FormControl, FormGroup, Validators, ReactiveFormsModule} from '@angular/forms';
 import * as echarts from 'echarts';
-import { TranslateService } from '@ngx-translate/core';
+import { TranslateModule } from '@ngx-translate/core';
 
 interface TreeNode<T> {
   data: T;
@@ -31,7 +32,63 @@ interface FSEntryListCat {
   Date: string;
   Action: string;
 }
+
 @Component({
+  standalone: true,
+  imports: [CommonModule, NbTreeGridModule, NbIconModule],
+  selector: 'ngx-fs-icon',
+  template: `
+    @if (Items != 0) {
+      <nb-tree-grid-row-toggle [expanded]="expanded"></nb-tree-grid-row-toggle>
+    } @else {
+      <nb-icon icon="file-text-outline"></nb-icon>
+    }
+  `,
+})
+export class FsIconComponent {
+  @Input() Items: number;
+  @Input() expanded: boolean;
+
+}
+
+@Component({
+  standalone: true,
+  imports: [CommonModule, NbTreeGridModule, NbIconModule],
+  selector: 'ngx-fs-icon-cat',
+  template: `
+    @if (type != null && type != undefined) {
+      <nb-tree-grid-row-toggle [expanded]="expanded"></nb-tree-grid-row-toggle>
+    } @else {
+      <nb-icon icon="file-text-outline"></nb-icon>
+    }
+  `,
+})
+export class FsIconComponentCat {
+  @Input() type: string;
+  @Input() expanded: boolean;
+
+}
+
+@Component({
+  standalone: true,
+  imports: [
+    CommonModule,
+    TranslateModule,
+    ReactiveFormsModule,
+    NbFormFieldModule,
+    NbInputModule,
+    NbButtonModule,
+    NbCardModule,
+    NbTreeGridModule,
+    NbIconModule,
+    NbTooltipModule,
+    NgxEchartsModule,
+    NbUserModule,
+    NbAccordionModule,
+    NbTableModule,
+    FsIconComponentCat,
+    FsIconComponent,
+  ],
   selector: 'ngx-mqa',
   templateUrl: './mqa.component.html',
   styleUrls: ['./mqa.component.scss']
@@ -49,8 +106,6 @@ export class MqaComponent implements OnInit {
   constructor(
     private mqaService : MqaService,
     private theme: NbThemeService,
-    private refreshService: RefreshService,
-    public translation: TranslateService,
     private dataSourceBuilder: NbTreeGridDataSourceBuilder<FSEntry>, //table catalogue score
     private dataSourceBuilder_dat: NbTreeGridDataSourceBuilder<FSEntryDataset>, //table dataset score
     private dataSourceBuilder_list: NbTreeGridDataSourceBuilder<FSEntryListCat> //table list of catalogues and datasets
@@ -65,7 +120,6 @@ export class MqaComponent implements OnInit {
 
   file: File | null = null;
   ngOnInit(): void {
-    this.refreshService.refreshPageOnce('admin-configuration');
     this.loadList();
   }
 
@@ -159,6 +213,7 @@ export class MqaComponent implements OnInit {
 
   option: any = {};
   themeSubscription: any;
+  overallScore = 0;
 
   
 
@@ -308,7 +363,9 @@ export class MqaComponent implements OnInit {
   }
 
   ngOnDestroy() {
-    this.themeSubscription.unsubscribe();
+    if (this.themeSubscription) {
+      this.themeSubscription.unsubscribe();
+    }
   }
 
   async deleteElement(id: string) : Promise<any>{
@@ -451,17 +508,17 @@ export class MqaComponent implements OnInit {
 
       this.dataSource = this.dataSourceBuilder.create(this.data);
       this.value = Math.floor((response.catalogue.score.overall/405) * 100);
-      //update chart value
-      this.ngAfterViewInit();
-      document.getElementById("overall").innerHTML = response.catalogue.score.overall;
+      // update chart value via setter
+      this.chartValue = this.value;
+      this.overallScore = response.catalogue.score.overall;
       // document.getElementById("response-type").innerHTML = "catalogue";
     } else {
       this.data = []
       this.dataSource = this.dataSourceBuilder.create(this.data);
       this.value = 0;
-      //update chart value
-      this.ngAfterViewInit();
-      document.getElementById("overall").innerHTML = "0";
+      // update chart value via setter
+      this.chartValue = 0;
+      this.overallScore = 0;
       // document.getElementById("response-type").innerHTML = "dataset";
     }
   }
@@ -490,37 +547,5 @@ export class MqaComponent implements OnInit {
       this.file = selectedFile;
   }
 
-
-}
-
-@Component({
-  selector: 'ngx-fs-icon',
-  template: `
-    <nb-tree-grid-row-toggle [expanded]="expanded" *ngIf="this.Items != 0; else fileIcon">
-    </nb-tree-grid-row-toggle>
-    <ng-template #fileIcon>
-      <nb-icon icon="file-text-outline"></nb-icon>
-    </ng-template>
-  `,
-})
-export class FsIconComponent {
-  @Input() Items: number;
-  @Input() expanded: boolean;
-
-}
-
-@Component({
-  selector: 'ngx-fs-icon-cat',
-  template: `
-    <nb-tree-grid-row-toggle [expanded]="expanded" *ngIf="this.type != null || this.type != undefined; else fileIcon">
-    </nb-tree-grid-row-toggle>
-    <ng-template #fileIcon>
-      <nb-icon icon="file-text-outline"></nb-icon>
-    </ng-template>
-  `,
-})
-export class FsIconComponentCat {
-  @Input() type: string;
-  @Input() expanded: boolean;
 
 }

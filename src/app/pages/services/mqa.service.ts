@@ -30,19 +30,22 @@ export class MqaService {
       },
       
       )
-      .subscribe((data: any) => {
-        if(data?.created_at != null){
-          const toastRef: NbToastRef = this.toastr.show('Found results', 'Success', { status: 'success', duration: 3000, destroyByClick: true, position: NbGlobalPhysicalPosition.TOP_RIGHT});
-        } else {
-          const toastRef: NbToastRef = this.toastr.show('Analisys is not yet completed, no score found, please try again later', 'Warning', { status: 'warning', duration: 3000, destroyByClick: true, position: NbGlobalPhysicalPosition.TOP_RIGHT});
+      .subscribe({
+        next: (data: any) => {
+          if(data?.created_at != null){
+            const toastRef: NbToastRef = this.toastr.show('Found results', 'Success', { status: 'success', duration: 3000, destroyByClick: true, position: NbGlobalPhysicalPosition.TOP_RIGHT});
+          } else {
+            const toastRef: NbToastRef = this.toastr.show('Analisys is not yet completed, no score found, please try again later', 'Warning', { status: 'warning', duration: 3000, destroyByClick: true, position: NbGlobalPhysicalPosition.TOP_RIGHT});
+          }
+          resolve(data)
+          return data
+        },
+        error: error => {
+          const toastRef: NbToastRef = this.toastr.show(error, 'Error', { status: 'danger', duration: 3000, destroyByClick: true, position: NbGlobalPhysicalPosition.TOP_RIGHT});
+          
+          reject(error)
+          return error
         }
-        resolve(data)
-        return data
-      }, error => {
-        const toastRef: NbToastRef = this.toastr.show(error, 'Error', { status: 'danger', duration: 3000, destroyByClick: true, position: NbGlobalPhysicalPosition.TOP_RIGHT});
-        
-        reject(error)
-        return error
       })
     })
   }
@@ -59,16 +62,19 @@ export class MqaService {
       },
       
       )
-      .subscribe((data: any) => {
-        const toastRef: NbToastRef = this.toastr.show('Deleted successfully', 'Success', { status: 'success', duration: 3000, destroyByClick: true, position: NbGlobalPhysicalPosition.TOP_RIGHT});
-        
-        resolve(data)
-        return data
-      }, error => {
-        const toastRef: NbToastRef = this.toastr.show("There was an error", 'Error', { status: 'danger', duration: 3000, destroyByClick: true, position: NbGlobalPhysicalPosition.TOP_RIGHT});
-        
-        reject(error)
-        return error
+      .subscribe({
+        next: (data: any) => {
+          const toastRef: NbToastRef = this.toastr.show('Deleted successfully', 'Success', { status: 'success', duration: 3000, destroyByClick: true, position: NbGlobalPhysicalPosition.TOP_RIGHT});
+          
+          resolve(data)
+          return data
+        },
+        error: error => {
+          const toastRef: NbToastRef = this.toastr.show("There was an error", 'Error', { status: 'danger', duration: 3000, destroyByClick: true, position: NbGlobalPhysicalPosition.TOP_RIGHT});
+          
+          reject(error)
+          return error
+        }
       })
     })
   }
@@ -85,14 +91,17 @@ export class MqaService {
         },
         
         )
-        .subscribe((data: any) => {
-          resolve(data)
-          return data
-        }, error => {
-          const toastRef: NbToastRef = this.toastr.show("There was an error", 'Error', { status: 'danger', duration: 3000, destroyByClick: true, position: NbGlobalPhysicalPosition.TOP_RIGHT});
-          
-          reject(error)
-          return error
+        .subscribe({
+          next: (data: any) => {
+            resolve(data)
+            return data
+          },
+          error: error => {
+            const toastRef: NbToastRef = this.toastr.show("There was an error", 'Error', { status: 'danger', duration: 3000, destroyByClick: true, position: NbGlobalPhysicalPosition.TOP_RIGHT});
+            
+            reject(error)
+            return error
+          }
         })
       })
     }
@@ -109,14 +118,17 @@ export class MqaService {
         },
         
         )
-        .subscribe((data: any) => {
-          resolve(data)
-          return data
-        }, error => {
-          const toastRef: NbToastRef = this.toastr.show("There was an error", 'Error', { status: 'danger', duration: 3000, destroyByClick: true, position: NbGlobalPhysicalPosition.TOP_RIGHT});
-          
-          reject(error)
-          return error
+        .subscribe({
+          next: (data: any) => {
+            resolve(data)
+            return data
+          },
+          error: error => {
+            const toastRef: NbToastRef = this.toastr.show("There was an error", 'Error', { status: 'danger', duration: 3000, destroyByClick: true, position: NbGlobalPhysicalPosition.TOP_RIGHT});
+            
+            reject(error)
+            return error
+          }
         })
       })
     }
@@ -137,21 +149,24 @@ export class MqaService {
         },
         
         )
-        .subscribe((data: any) => {
-          if(data?.message != null){
-            const toastRef: NbToastRef = this.toastr.show('Analisys submitted', 'Success', { status: 'success', duration: 3000, destroyByClick: true, position: NbGlobalPhysicalPosition.TOP_RIGHT});
-            resolve(data)
-            return data
-          } else {
+        .subscribe({
+          next: (data: any) => {
+            if(data?.message != null){
+              const toastRef: NbToastRef = this.toastr.show('Analisys submitted', 'Success', { status: 'success', duration: 3000, destroyByClick: true, position: NbGlobalPhysicalPosition.TOP_RIGHT});
+              resolve(data)
+              return data
+            } else {
+              const toastRef: NbToastRef = this.toastr.show("There was an error", 'Error', { status: 'danger', duration: 3000, destroyByClick: true, position: NbGlobalPhysicalPosition.TOP_RIGHT});
+              reject(data)
+              return data
+            }
+          },
+          error: error => {
             const toastRef: NbToastRef = this.toastr.show("There was an error", 'Error', { status: 'danger', duration: 3000, destroyByClick: true, position: NbGlobalPhysicalPosition.TOP_RIGHT});
-            reject(data)
-            return data
+            
+            reject(error)
+            return error
           }
-        }, error => {
-          const toastRef: NbToastRef = this.toastr.show("There was an error", 'Error', { status: 'danger', duration: 3000, destroyByClick: true, position: NbGlobalPhysicalPosition.TOP_RIGHT});
-          
-          reject(error)
-          return error
         })
       })
     }
@@ -165,21 +180,24 @@ export class MqaService {
         },
         
         )
-        .subscribe((data: any) => {
-          if(data?.message != null){
-            const toastRef: NbToastRef = this.toastr.show('Analisys submitted', 'Success', { status: 'success', duration: 3000, destroyByClick: true, position: NbGlobalPhysicalPosition.TOP_RIGHT});
-            resolve(data)
-            return data
-          } else {
+        .subscribe({
+          next: (data: any) => {
+            if(data?.message != null){
+              const toastRef: NbToastRef = this.toastr.show('Analisys submitted', 'Success', { status: 'success', duration: 3000, destroyByClick: true, position: NbGlobalPhysicalPosition.TOP_RIGHT});
+              resolve(data)
+              return data
+            } else {
+              const toastRef: NbToastRef = this.toastr.show("There was an error", 'Error', { status: 'danger', duration: 3000, destroyByClick: true, position: NbGlobalPhysicalPosition.TOP_RIGHT});
+              reject(data)
+              return data
+            }
+          },
+            error: error => {
             const toastRef: NbToastRef = this.toastr.show("There was an error", 'Error', { status: 'danger', duration: 3000, destroyByClick: true, position: NbGlobalPhysicalPosition.TOP_RIGHT});
-            reject(data)
-            return data
+            
+            reject(error)
+            return error
           }
-        }, error => {
-          const toastRef: NbToastRef = this.toastr.show("There was an error", 'Error', { status: 'danger', duration: 3000, destroyByClick: true, position: NbGlobalPhysicalPosition.TOP_RIGHT});
-          
-          reject(error)
-          return error
         })
       })
     }

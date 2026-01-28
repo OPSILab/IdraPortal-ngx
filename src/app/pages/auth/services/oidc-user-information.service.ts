@@ -3,6 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { BehaviorSubject, Observable, of } from 'rxjs';
 import { OidcJWTToken, UserClaims } from '../oidc/oidc';
 import { NbAuthService } from '@nebular/auth';
+import { JwtHelperService } from '@auth0/angular-jwt';
 
 @Injectable({
   providedIn: 'root'
@@ -12,15 +13,39 @@ export class OidcUserInformationService {
   user: UserClaims;
   protected user$: BehaviorSubject<any> = new BehaviorSubject(null);
 
-  constructor( private http: HttpClient,
-    private authService: NbAuthService,) {
+  constructor(
+    private http: HttpClient,
+    private authService: NbAuthService,
+    private jwtHelper: JwtHelperService,
+  ) {
 
     // this.idmUrl = configService.getSettings("idmBaseURL");
     this.authService.onTokenChange()
-      .subscribe((token: OidcJWTToken) => {
-        if (token.isValid()){
-          this.user=token.getAccessTokenPayload()
-          this.publishUser(this.user)
+      .subscribe((token: any) => {
+        if (!token || typeof token.isValid !== 'function' || !token.isValid()) {
+          return;
+        }
+
+        // Prefer Nebular's OAuth2 JWT token API when available
+        if (typeof token.getAccessTokenPayload === 'function') {
+          this.user = token.getAccessTokenPayload() as UserClaims;
+          this.publishUser(this.user);
+          return;
+        }
+
+        // Fallback: try to decode access token if present
+        try {
+          const payloadSource = typeof token.getPayload === 'function' ? token.getPayload() : undefined;
+          const accessToken: string | undefined = payloadSource?.access_token
+            || (typeof token.getValue === 'function' ? token.getValue() : undefined);
+
+          if (accessToken && accessToken.split('.').length === 3) {
+            const decoded = this.jwtHelper.decodeToken(accessToken) as UserClaims;
+            this.user = decoded;
+            this.publishUser(this.user);
+          }
+        } catch {
+          // ignore decode errors; no user info can be derived from this token
         }
       });
 

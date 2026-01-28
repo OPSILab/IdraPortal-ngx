@@ -19,8 +19,7 @@
     shape="semi-round"
     filled
     >
-      <nb-option
-        *ngFor="let lang of languages"
+      @for (lang of languages; track lang.lan) {<nb-option
         [value]="lang.lan"
         class="d-flex flex-row align-items-center white-background"
       >
@@ -31,7 +30,7 @@
           showTitle="false"
         >
         </nb-user>
-      </nb-option>
+      </nb-option>}
     </nb-select>
   </div>
   <div>
@@ -44,56 +43,54 @@
     filled
     style="margin-right: 3%;"
   >
-    <nb-option *ngFor="let theme of themes" [value]="theme.value">
-      {{ theme.name }}</nb-option
-    >
+    @for (theme of themes; track theme.value) {<nb-option [value]="theme.value">
+      {{ theme.name }}</nb-option>}
   </nb-select>
   </div>
 </div>
 
 
-<div class="header-container"
-  *ngIf="typeLogin.toLowerCase() === 'keycloak'" >
+@if (typeLogin.toLowerCase() === 'keycloak') {<div class="header-container" >
 
-  <nb-actions size="small" *ngIf="authenticationEnabled">
+  @if (authenticationEnabled) {<nb-actions size="small">
     <nb-action
       class="user-action">
-      <div *ngIf="user">
-      <nb-user  *ngIf="user.roles!==undefined"
+      @if (user) {<div>
+      @if (user.roles!==undefined) {<nb-user
                 [nbContextMenu]="userMenu"
                 nbContextMenuTag="user-menu"
                 [onlyPicture]="userPictureOnly"
                 [name]="(user?.name!==undefined)?user?.name:user?.preferred_username"
                 [title]="user?.roles.join(' | ')"
                 [picture]="'assets/images/default_user.png'">
-      </nb-user>
+      </nb-user>}
 
-      <nb-user  *ngIf="user.realm_access!==undefined && user.realm_access.roles !== undefined"
+      @if (user.realm_access!==undefined && user.realm_access.roles !== undefined) {<nb-user
                 [nbContextMenu]="userMenu"
                 nbContextMenuTag="user-menu"
                 [onlyPicture]="userPictureOnly"
                 [name]="(user?.name!==undefined)?user?.name:user?.preferred_username"
                 [title]="user?.realm_access.roles.join(' | ')"
                 [picture]="'assets/images/default_user.png'">
-      </nb-user>
-    </div>
+      </nb-user>}
+    </div>}
     </nb-action>
-  </nb-actions>
+  </nb-actions>}
         <!-- Not Authenticated -->
-    <nb-actions size="small" *ngIf="authenticationEnabled && (user=== undefined || user === null)">
+    @if (authenticationEnabled && (user=== undefined || user === null)) {<nb-actions size="small">
       <nb-action class="user-action" >
         <nb-user [nbContextMenu]="userMenuDefault" nbContextMenuTag="user-menu" [onlyPicture]="userPictureOnly"
 
           [picture]="'assets/images/default_user.png'">
         </nb-user>
       </nb-action>
-    </nb-actions>
+    </nb-actions>}
 
-</div>
+</div>}
 
-<div *ngIf="typeLogin.toLowerCase() === 'basic'" class="header-container" fxLayout="row" fxLayoutAlign="start center">
+@if (typeLogin.toLowerCase() === 'basic') {<div class="header-container" fxLayout="row" fxLayoutAlign="start center">
 
-  <nb-actions size="small" *ngIf="authenticationEnabled">
+  @if (authenticationEnabled) {<nb-actions size="small">
     <nb-action class="user-action" matRipple [matRippleUnbounded]="true" [matRippleCentered]="true">
       <nb-user [nbContextMenu]="userMenu"
                nbContextMenuTag="user-menu"
@@ -103,11 +100,8 @@
                [picture]="'assets/images/default_user.png'">
       </nb-user>
     </nb-action>
-  </nb-actions>
+  </nb-actions>}
   <div class="login-container m-left-16" fxFlex="none" >
-    <ng-template #login>
-      <button nbButton (click)="logIn()">Login</button>
-    </ng-template>
-    <button nbButton (click)="logOut()" *ngIf="authenticated; else login">Logout</button>
+    @if (authenticated) {<button nbButton (click)="logOut()">Logout</button>} @else {<button nbButton (click)="logIn()">Login</button>}
   </div>
-</div>
+</div>}

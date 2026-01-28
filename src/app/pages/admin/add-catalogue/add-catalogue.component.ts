@@ -1,14 +1,12 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { CataloguesServiceService } from '../catalogues-service.service';
-import { SharedService } from '../../services/shared.service';
+import { CataloguesServiceService } from '../../services/catalogues-service.service';
 import { DomSanitizer} from '@angular/platform-browser';
-import { NbDialogService, NbToastrService } from '@nebular/theme';
-import { TranslateService } from '@ngx-translate/core';
-import { HttpErrorResponse } from '@angular/common/http';
-import { RefreshService } from '../../services/refresh.service';
-import { PrefixDialogComponent } from '../admin-configurations/dialog/prefix-dialog/prefix-dialog.component';
+import { NbButtonModule, NbCardModule, NbDialogService, NbIconModule, NbInputModule, NbSelectModule, NbSpinnerModule, NbToastrService, NbTooltipModule } from '@nebular/theme';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { EditorDialogComponent } from './dialog/editor-dialog/editor-dialog.component';
+import { FormsModule } from '@angular/forms';
+import { CommonModule } from '@angular/common';
 
 export interface Node {
 	id : string ;
@@ -61,6 +59,7 @@ export interface Node {
 }
 
 @Component({
+  imports: [NbCardModule, TranslateModule, NbSpinnerModule, NbSelectModule, FormsModule, NbButtonModule, NbInputModule, CommonModule, NbIconModule, NbTooltipModule],
   selector: 'ngx-add-catalogue',
   templateUrl: './add-catalogue.component.html',
   styleUrls: ['./add-catalogue.component.scss']
@@ -419,7 +418,6 @@ export class AddCatalogueComponent implements OnInit {
 		private sanitizer: DomSanitizer, 
 		private toastrService: NbToastrService,
 		public translation: TranslateService,
-		private refreshService: RefreshService,
 		private dialogService: NbDialogService
 	) {}
 
@@ -428,26 +426,58 @@ export class AddCatalogueComponent implements OnInit {
 	loading: boolean = false;
 	modifyMode : boolean = false;
 
-	handleOpenEditorDialog() {
-		this.dialogService.open(EditorDialogComponent, {
-			context: {
-			model: {
-				language: 'json',
-				uri: 'main.json',
-				value: this.node.dumpString,
-			}
-			},
-		}).onClose.subscribe(res => {
-			if(res != false) {
-			console.log(res);
-			this.node.dumpString = res;
-			}
-		});
+	handleOpenEditorDialog(opt: number) {
+		let value;
+		switch(opt){
+			case 1:
+				value = this.node.dumpString;
+				break;
+			case 2:
+				value = this.node.additionalConfig.orionDatasetDumpString;
+				break;
+			case 3:
+				value = this.node.additionalConfig.sparqlDatasetDumpString;
+				break;
+			case 4:
+				value = this.node.sitemap;
+				break;
+			default:
+				value = null;
+		}
+		if(value != null)
+			this.dialogService.open(EditorDialogComponent, {
+				context: {
+				model: {
+					language: 'json',
+					uri: 'main.json',
+					value: value,
+				}
+				},
+			}).onClose.subscribe(res => {
+				if(res != false) {
+					switch(opt){
+						case 1:
+							this.node.dumpString = res;
+							break;
+						case 2:
+							this.node.additionalConfig.orionDatasetDumpString = res;
+							break;
+						case 3:
+							this.node.additionalConfig.sparqlDatasetDumpString = res;
+							break;
+						case 4:
+							try{
+								this.node.sitemap = JSON.parse(res);
+							}catch(e){
+								this.toastrService.danger(this.translation.instant('INVALID_JSON_FORMAT'), this.translation.instant('ERROR'));
+							}
+							break;
+					}
+				}
+			});
 	}
 
     ngOnInit(): void {
-		this.refreshService.refreshPageOnce('admin-configuration');
-		this.refreshService.refreshPageOnce('admin-configuration');
 		this.route.queryParams
 			.subscribe(params => {
 			if(params.modifyId != null && params.modifyId != undefined && params.modifyId != ''){
@@ -548,7 +578,7 @@ export class AddCatalogueComponent implements OnInit {
 			inserted : false
 			};
 			this.imageUrl = this.node.image.imageData;
-			document.getElementById('fileName').innerHTML = 'Choose file';
+			// document.getElementById('fileName').innerHTML = 'Choose file';
 	}
 	
 	public changedRefreshHandler($event){
@@ -557,42 +587,39 @@ export class AddCatalogueComponent implements OnInit {
 
 	public async createNode(){
 		this.loading = true;
-
+		
 		this.node.nameInvalid = this.node.name.trim() === '' ? true : false;
 		this.node.pubNameInvalid = this.node.publisherName.trim() === '' ? true : false;
 
 		if(this.node.host.trim() === ''){
-			this.node.hostInvalid = this.node.nodeType === 'DCATDUMP' ? false : true;	
- 			if(this.node.nodeType == 'ZENODO'){
- 				if(this.node.communities == '')
- 				{
- 					this.node.hostInvalid=true;
- 					this.toastrService.danger('Catalogue communities field required for complete url', 'Error');
- 				}
- 				else
- 				{
- 					this.node.hostInvalid=false;
- 					this.node.host = 'https://zenodo.org/api/records?communities='+this.node.communities;
- 				}
- 			}			
+			this.node.hostInvalid = this.node.nodeType === 'DCATDUMP' ? false : true;
 		}else{
 			this.node.hostInvalid=false;
-			if(this.node.nodeType == 'ZENODO'){
-				if(this.node.communities == '')
-				{
-					this.node.hostInvalid=true;
-					this.toastrService.danger('Catalogue communities field required for complete url', 'Error');
-				}
-				else
-				{
-					this.node.hostInvalid=false;
-					this.node.host = 'https://zenodo.org/api/records?communities='+this.node.communities;
-				}
-			}
 		}
 		
-		if(this.node.homepage.trim() === ''){
-			this.node.homepageInvalid = this.node.nodeType === 'DCATDUMP' ? false : true;
+		if(this.node.nodeType == 'ZENODO'){
+			if(this.node.communities == '')
+			{
+				this.node.hostInvalid=true;
+				this.toastrService.danger('Catalogue communities field required for complete url', 'Error');
+			}
+			else
+			{
+				this.node.hostInvalid=false;
+				this.node.host = 'https://zenodo.org/api/records?communities='+this.node.communities;
+			}
+		}
+		if(this.node.name==''){
+			this.node.nameInvalid=true;
+		} else if (this.node.publisherName=='') {
+			this.node.pubNameInvalid=true;
+		}else {
+			this.node.nameInvalid=false;
+			this.node.pubNameInvalid=false;
+		}
+
+		if(this.node.homepage == ''){
+			this.node.homepageInvalid=true;
 		}else{
 			this.node.homepageInvalid=false;
 		}
@@ -629,7 +656,7 @@ export class AddCatalogueComponent implements OnInit {
 		//if(validateUrl(node.host)){
 		switch(this.node.nodeType){
 			case 'CKAN':
-			case 'ZENODO':	
+			case 'ZENODO':
 				this.node.federationLevel='LEVEL_3';
 				break;
 			case 'DKAN':
@@ -754,15 +781,17 @@ export class AddCatalogueComponent implements OnInit {
 
 				fd.append("node",JSON.stringify(this.node));
 				
-				this.restApi.modODMSNode(fd, params.modifyId).subscribe(infos =>{
-					this.loading = false;
-					this.router.navigate(['/catalogues']);
-				},(err: HttpErrorResponse)=>{
-					console.log(err);					
-					this.toastrService.danger('Could not update catalogue: '+err.error.userMessage,'Error');
-					this.loading = false;
+				this.restApi.modODMSNode(fd, params.modifyId).subscribe({
+					next: (infos) => {
+						this.loading = false;
+						this.router.navigate(['/catalogues']);
+					},
+					error: (err) => {
+						this.loading = false;
+						this.toastrService.danger('Could not update catalogue','Error');
+					}
 				})
-	
+
 			} else {
 
 				this.node.synchLock = 'FIRST';
@@ -773,14 +802,16 @@ export class AddCatalogueComponent implements OnInit {
 				this.node.inserted=false;
 
 				fd.append("node",JSON.stringify(this.node));
-				this.restApi.addODMSNode(fd).subscribe(infos =>{
-					this.router.navigate(['/catalogues']);
-					this.loading = false;
-				
-				},(err: HttpErrorResponse)=>{
-					console.log(err);
-					this.toastrService.danger('Could not create catalogue: '+err.error.userMessage,'Error');
-					this.loading = false;
+
+				this.restApi.addODMSNode(fd).subscribe({
+					next: (infos) => {
+						this.router.navigate(['/catalogues']);
+						this.loading = false;
+					},
+					error: (err) => {
+						this.loading = false;
+						this.toastrService.danger('Could not update catalogue','Error');
+					}
 				})
 				
 			}
@@ -815,23 +846,23 @@ export class AddCatalogueComponent implements OnInit {
 			case 2:
 				reader.readAsText(file);
 				reader.onload = () => {
-					this.node.additionalConfig.orionDatasetDumpString = JSON.parse(reader.result.toString());
+					this.node.additionalConfig.orionDatasetDumpString = reader.result.toString();
 				}
 				break;
 			case 3:
 				reader.readAsText(file);
 				reader.onload = () => {
-					this.node.additionalConfig.sparqlDatasetDumpString = JSON.parse(reader.result.toString());
+					this.node.additionalConfig.sparqlDatasetDumpString = reader.result.toString();
 				}
 				break;
 			case 4:
 				reader.readAsText(file);
 				reader.onload = () => {
-					this.node.sitemap = JSON.parse(reader.result.toString());
+					this.node.sitemap = reader.result.toString();
 				}
 				break;
 		}
-		document.getElementsByClassName('custom-file-label')[caseFile].innerHTML = file.name;
+		// document.getElementsByClassName('custom-file-label')[caseFile].innerHTML = file.name;
 	}
 
 	updateImage(url : any){
