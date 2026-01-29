@@ -28,7 +28,7 @@ jobs:
       - name: Setup SSH
         uses: webfactory/ssh-agent@v0.9.1
         with:
-          ssh-private-key: ${{ secrets.IDRA }}
+          ssh-private-key: ${{ secrets.IDRA_KEY }}
 
       - name: Set Git user
         run: |
